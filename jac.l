@@ -10,15 +10,15 @@
 
 #define RETURN_TOKEN(x) {yylval.token = strdup(yytext); return x;}
 %}
-LINE								("\n"|"\r"|"\r\n")
-SPACE								(" "|"\t"|"\f")
+LINE								            ("\n"|"\r"|"\r\n")
+SPACE								            (" "|"\t"|"\f")
 ID                          		(_|$|[a-z]|[A-Z])(_|$|[a-z]|[A-Z]|[0-9])*
 DECLIT                      		0|[1-9]+(([0-9]|_)*[0-9]+)?
 R_INT                       		[0-9]+(([0-9]|_)*[0-9]+)?
 R_EXP                       		[eE][+-]?{R_INT}
 REALLIT                     		({R_INT}\.({R_INT}?|{R_EXP}?))|(\.{R_INT}{R_EXP}?)|({R_INT}{R_EXP})|(({R_INT})\.{R_INT}{R_EXP})
-STRLIT								\"([^\\\n""\"""\r"]|{ESCAPE})*\"
-ESCAPE				        		\\f|\\n|\\r|\\t|\\\\|\\\"
+STRLIT								          \"([^\\\n""\"""\r"]|{ESCAPE})*\"
+ESCAPE				        		      \\f|\\n|\\r|\\t|\\\\|\\\"
 BOOL                        		"boolean"
 BOOLLIT                      		"true"|"false"
 CLASS                       		"class"
@@ -68,7 +68,7 @@ ILLEGAL								.
 %%
 {LINE}								{n_column = 1;n_lines++;}
 {SPACE}								{n_column+=yyleng;}
-{BOOL}				              	{n_column+=yyleng; if (flag == 1){printf("BOOL\n");} else if(flag== 3){RETURN_TOKEN(BOOL);};} 
+{BOOL}				              	{n_column+=yyleng; if (flag == 1){printf("BOOL\n");} else if(flag== 3){RETURN_TOKEN(BOOL);};}
 {BOOLLIT}			           		{n_column+=yyleng; if (flag == 1){printf("BOOLLIT(%s)\n",yytext);} else if(flag== 3){RETURN_TOKEN(BOOLLIT);};}
 {CLASS}			              		{n_column+=yyleng; if (flag == 1){printf("CLASS\n");} else if(flag== 3) {RETURN_TOKEN(CLASS);};}
 {DO}				             	{n_column+=yyleng; if (flag == 1){printf("DO\n");} else if(flag== 3) {RETURN_TOKEN(DO);};}
@@ -114,11 +114,11 @@ ILLEGAL								.
 {DECLIT}                 			{n_column+=yyleng; if (flag == 1){printf("DECLIT(%s)\n",yytext);} else if(flag== 3) {RETURN_TOKEN(DECLIT);};}
 {STRLIT}                    		{n_column+=yyleng; if (flag == 1){printf("STRLIT(%s)\n",yytext);} else if(flag== 3) {RETURN_TOKEN(STRLIT);};}
 
-"/*"								{BEGIN COMMENT;st_line = n_lines;st_column = n_column;n_column+=yyleng;}
+"/*"								          {BEGIN COMMENT;st_line = n_lines;st_column = n_column;n_column+=yyleng;}
 <COMMENT>("\r"|"\n"|"\r\n")			{n_column = 1;n_lines++;}
 <COMMENT>"*/"						{BEGIN 0;n_column+=yyleng;}
 <COMMENT>.							{n_column+=yyleng;}
-<COMMENT><<EOF>>					{printf("Line %d, col %d: unterminated comment\n",st_line,st_column);BEGIN 0;} 
+<COMMENT><<EOF>>					{printf("Line %d, col %d: unterminated comment\n",st_line,st_column);BEGIN 0;}
 
 "//"								{BEGIN COMMENT_B;n_column+=yyleng;}
 <COMMENT_B>("\r"|"\n"|"\r\n") 		{BEGIN 0;n_column = 1;n_lines++;}
@@ -127,14 +127,13 @@ ILLEGAL								.
 
 
 \"									{BEGIN STRING_ESCAPE;st_line = n_lines;st_column = n_column;n_column+=yyleng;}
-<STRING_ESCAPE>{ESCAPE}				{n_column+=yyleng;}		
+<STRING_ESCAPE>{ESCAPE}				{n_column+=yyleng;}
 <STRING_ESCAPE>\"					{BEGIN 0 ;n_column+=yyleng;}
 <STRING_ESCAPE>(\\.|\\)				{printf("Line %d, col %d: invalid escape sequence (%s)\n",n_lines,n_column,yytext);n_column+=yyleng;BEGIN STRING_ESCAPE;}
 <STRING_ESCAPE>{LINE}     			{printf("Line %d, col %d: unterminated string literal\n", n_lines, st_column);n_lines++;n_column=1;BEGIN 0;}
 <STRING_ESCAPE><<EOF>>              {printf("Line %d, col %d: unterminated string literal\n", n_lines, n_column);BEGIN 0;}
 <STRING_ESCAPE>.            		{n_column+=yyleng;}
 
-<<EOF>>								{yylval.inteiro=EOF ; return -1;}
 
 {ILLEGAL}							{printf("Line %d, col %d: illegal character (%s)\n",n_lines,n_column,yytext);n_column+=yyleng;}
 
