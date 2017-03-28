@@ -72,20 +72,24 @@ int parse = 0;
 %nonassoc NO_ELSE
 %nonassoc ELSE
 
+
+%start Program
+%left COMMA
 %right ASSIGN
 %left OR
 %left AND
 %left EQ NEQ
-%left LEQ GEQ LT GT
+%left LT GT LEQ GEQ
 %left PLUS MINUS
 %left STAR DIV MOD
-%left NOT
-
+%right NOT
+%right PRECEDENCE
+%left OBRACE OCURV OSQUARE CCURV CSQUARE CBRACE
 
 %%
 
 Program: CLASS ID OBRACE  ProgramAux  CBRACE
-	| CLASS ID OBRACE CBRACE                   {printf("CLASS\n");}
+	| CLASS ID OBRACE CBRACE
 	;
 
 ProgramAux : FieldDecl
@@ -109,7 +113,7 @@ FieldDeclAux
 
 MethodDecl: PUBLIC STATIC MethodHeader MethodBody ;
 
-MethodHeader: Type  ID OCURV CCURV
+MethodHeader: Type ID OCURV CCURV
 	| Type  ID OCURV FormalParams CCURV
 	| VOID ID OCURV CCURV
 	| VOID ID OCURV FormalParams CCURV
@@ -151,6 +155,7 @@ Type: BOOL
 	;
 
 Statement: OBRACE StatementAux CBRACE
+  | OBRACE CBRACE
 	| IF OCURV Expr CCURV Statement %prec NO_ELSE
 	| IF OCURV Expr CCURV Statement ELSE Statement
 	| WHILE OCURV Expr CCURV Statement
@@ -159,7 +164,11 @@ Statement: OBRACE StatementAux CBRACE
 	| PRINT OCURV STRLIT CCURV SEMI
 	| SEMI
 	| Assignment SEMI
+  | Assignment ParseArgs SEMI
+  | Assignment MethodInvocation SEMI
+  | Assignment MethodInvocation ParseArgs SEMI
 	| MethodInvocation SEMI
+  | MethodInvocation ParseArgs SEMI
 	| ParseArgs SEMI
 	| RETURN  SEMI
 	| RETURN  Expr SEMI
