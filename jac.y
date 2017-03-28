@@ -10,6 +10,7 @@ int n_lines = 1;
 int n_column = 1;
 extern char* yytext;
 int flag = 0 ;
+int parse = 0;
 
 %}
 
@@ -84,7 +85,7 @@ int flag = 0 ;
 %%
 
 Program: CLASS ID OBRACE  ProgramAux  CBRACE
-	| CLASS ID OBRACE CBRACE
+	| CLASS ID OBRACE CBRACE                   {printf("CLASS\n");}
 	;
 
 ProgramAux : FieldDecl
@@ -98,12 +99,12 @@ ProgramAux : FieldDecl
 
 FieldDecl: PUBLIC STATIC Type ID FieldDeclAux SEMI
 	| PUBLIC STATIC Type ID  SEMI
+  | error SEMI
 	;
 
 FieldDeclAux
 	: COMMA ID
 	| FieldDeclAux COMMA ID
-	| error SEMI
 	;
 
 MethodDecl: PUBLIC STATIC MethodHeader MethodBody ;
@@ -233,12 +234,11 @@ int main(int argc, char *argv[]) {
 			flag=0;
 			yylex();
 		}
-
-
 	}
 	if (argc == 1 )
 	{
-		flag = -1;
+    printf("CONA\n");
+		parse = -1;
     yyparse();
 	}
 
@@ -246,6 +246,6 @@ int main(int argc, char *argv[]) {
 }
 void yyerror(char* s)
 {
-	if ( flag == -1)
+	if ( parse == -1)
 		printf("Line %d, col %d: %s: %s\n", n_lines, (int)(n_column - strlen(yytext)), s, yytext);
 }
