@@ -182,6 +182,7 @@ StatementAux: Statement
 Assignment: ID ASSIGN Expr ;
 
 MethodInvocation: ID OCURV CCURV
+  | ID OCURV Expr CCURV
 	| ID OCURV Expr MethodInvocationAux CCURV
 	| ID OCURV error CCURV
 	;
