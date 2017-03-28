@@ -10,14 +10,15 @@ int n_lines = 1;
 int n_column = 1;
 extern char* yytext;
 int flag = 0 ;
+int parse = 0;
 
 %}
 
 
 %union
 {
-    char* token;  
-    int inteiro;  
+    char* token;
+    int inteiro;
 }
 
 
@@ -71,52 +72,56 @@ int flag = 0 ;
 %nonassoc NO_ELSE
 %nonassoc ELSE
 
+
+%start Program
+%left COMMA
 %right ASSIGN
 %left OR
 %left AND
 %left EQ NEQ
-%left LEQ GEQ LT GT
+%left LT GT LEQ GEQ
 %left PLUS MINUS
 %left STAR DIV MOD
-%left NOT
-
+%right NOT
+%right PRECEDENCE
+%left OBRACE OCURV OSQUARE CCURV CSQUARE CBRACE
 
 %%
 
-Program: CLASS ID OBRACE  ProgramAux  CBRACE 
-	| CLASS ID OBRACE CBRACE		
+Program: CLASS ID OBRACE  ProgramAux  CBRACE
+	| CLASS ID OBRACE CBRACE
 	;
 
 ProgramAux : FieldDecl
-	| MethodDecl	
+	| MethodDecl
 	| SEMI
 	| ProgramAux FieldDecl
-	| ProgramAux MethodDecl 
+	| ProgramAux MethodDecl
 	| ProgramAux SEMI
 	;
 
 
-FieldDecl: PUBLIC STATIC Type ID FieldDeclAux SEMI  
-	| PUBLIC STATIC Type ID  SEMI   
+FieldDecl: PUBLIC STATIC Type ID FieldDeclAux SEMI
+	| PUBLIC STATIC Type ID  SEMI
+  | error SEMI
 	;
 
 FieldDeclAux
-	: COMMA ID    
-	| FieldDeclAux COMMA ID 
-	| error SEMI
+	: COMMA ID
+	| FieldDeclAux COMMA ID
 	;
 
 MethodDecl: PUBLIC STATIC MethodHeader MethodBody ;
 
-MethodHeader: Type  ID OCURV CCURV     			
-	| Type  ID OCURV FormalParams CCURV 		
-	| VOID ID OCURV CCURV 						
-	| VOID ID OCURV FormalParams CCURV 			
+MethodHeader: Type ID OCURV CCURV
+	| Type  ID OCURV FormalParams CCURV
+	| VOID ID OCURV CCURV
+	| VOID ID OCURV FormalParams CCURV
 	;
 
 
-MethodBody: OBRACE CBRACE 
-	| OBRACE MethodBodyAux CBRACE 				
+MethodBody: OBRACE CBRACE
+	| OBRACE MethodBodyAux CBRACE
 	;
 
 
@@ -127,40 +132,45 @@ MethodBodyAux: VarDecl
 	;
 
 
-FormalParams: Type ID   
-	| Type ID FormalParamsAux 							
-	| STRING OSQUARE CSQUARE ID  
+FormalParams: Type ID
+	| Type ID FormalParamsAux
+	| STRING OSQUARE CSQUARE ID
 	;
 
 
 FormalParamsAux
-	: FormalParamsAux COMMA Type ID 
+	: FormalParamsAux COMMA Type ID
 	| COMMA Type ID
 	;
 
 
 VarDecl
 	: Type ID FieldDeclAux SEMI
-	| Type ID SEMI 		
+	| Type ID SEMI
 	;
 
-Type: BOOL     
-	| INT 	
-	| DOUBLE	
+Type: BOOL
+	| INT
+	| DOUBLE
 	;
 
-Statement: OBRACE StatementAux CBRACE  
-	| IF OCURV Expr CCURV Statement %prec NO_ELSE 
-	| IF OCURV Expr CCURV Statement ELSE Statement 
-	| WHILE OCURV Expr CCURV Statement 
-	| DO Statement WHILE OCURV Expr CCURV SEMI 
-	| PRINT OCURV Expr CCURV SEMI 
-	| PRINT OCURV STRLIT CCURV SEMI 
-	| SEMI	 
-	| Assignment SEMI  
-	| MethodInvocation SEMI 
-	| ParseArgs SEMI 
-	| RETURN  SEMI 
+Statement: OBRACE StatementAux CBRACE
+  | OBRACE CBRACE
+	| IF OCURV Expr CCURV Statement %prec NO_ELSE
+	| IF OCURV Expr CCURV Statement ELSE Statement
+	| WHILE OCURV Expr CCURV Statement
+	| DO Statement WHILE OCURV Expr CCURV SEMI
+	| PRINT OCURV Expr CCURV SEMI
+	| PRINT OCURV STRLIT CCURV SEMI
+	| SEMI
+	| Assignment SEMI
+  | Assignment ParseArgs SEMI
+  | Assignment MethodInvocation SEMI
+  | Assignment MethodInvocation ParseArgs SEMI
+	| MethodInvocation SEMI
+  | MethodInvocation ParseArgs SEMI
+	| ParseArgs SEMI
+	| RETURN  SEMI
 	| RETURN  Expr SEMI
 	| error SEMI
 	;
@@ -172,7 +182,8 @@ StatementAux: Statement
 Assignment: ID ASSIGN Expr ;
 
 MethodInvocation: ID OCURV CCURV
-	| ID OCURV Expr MethodInvocationAux CCURV 
+  | ID OCURV Expr CCURV
+	| ID OCURV Expr MethodInvocationAux CCURV
 	| ID OCURV error CCURV
 	;
 
@@ -183,36 +194,65 @@ MethodInvocationAux : COMMA Expr
 
 ParseArgs: PARSEINT OCURV ID OSQUARE Expr CSQUARE CCURV
 	| PARSEINT OCURV error CCURV
-	; 
+	;
 
 
-Expr: Assignment 
-	| MethodInvocation  
-	| ParseArgs 
-	| Expr AND Expr 
-	| Expr OR Expr 
-	| Expr EQ Expr   
-	| Expr GEQ Expr 
-	| Expr GT Expr 
-	| Expr LEQ Expr 
-	| Expr LT Expr 
-	| Expr NEQ Expr 
-	| Expr PLUS Expr 
-	| Expr MINUS Expr 
-	| Expr STAR Expr 
-	| Expr DIV Expr 
-	| Expr MOD Expr 
-	| PLUS Expr 
-	| MINUS Expr 
-	| NOT Expr 
-	| ID 
-	| ID DOTLENGTH 
-	| OCURV Expr CCURV 
-	| BOOLLIT 
-	| DECLIT 
-	| REALLIT 
+Expr: Assignment
+	| MethodInvocation
+	| ParseArgs
+	| Expr AND ExprAux
+	| Expr OR ExprAux
+	| Expr EQ ExprAux
+	| Expr GT ExprAux
+  | Expr GEQ ExprAux
+	| Expr LEQ ExprAux
+	| Expr LT ExprAux
+	| Expr NEQ ExprAux
+	| Expr PLUS ExprAux
+	| Expr MINUS ExprAux
+	| Expr STAR ExprAux
+	| Expr DIV ExprAux
+	| Expr MOD ExprAux
+	| PLUS ExprAux
+	| MINUS ExprAux
+	| NOT ExprAux
+	| ID
+	| ID DOTLENGTH
+	| OCURV Expr CCURV
+	| BOOLLIT
+	| DECLIT
+	| REALLIT
 	| OCURV error CCURV
-	; 
+	;
+
+  ExprAux
+  	: MethodInvocation
+  	| ParseArgs
+  	| ExprAux AND ExprAux
+  	| ExprAux OR ExprAux
+  	| ExprAux EQ ExprAux
+  	| ExprAux GEQ ExprAux
+  	| ExprAux GT ExprAux
+  	| ExprAux LEQ ExprAux
+  	| ExprAux LT ExprAux
+  	| ExprAux NEQ ExprAux
+  	| ExprAux PLUS ExprAux
+  	| ExprAux STAR ExprAux
+    | ExprAux MINUS ExprAux
+  	| ExprAux DIV ExprAux
+  	| ExprAux MOD ExprAux
+    | PLUS ExprAux
+  	| MINUS ExprAux
+  	| NOT ExprAux
+  	| ID
+  	| ID DOTLENGTH
+  	| OCURV ExprAux CCURV
+  	| BOOLLIT
+  	| DECLIT
+  	| REALLIT
+  	| OCURV error CCURV
+  	;
+
 
 %%
 
@@ -226,38 +266,26 @@ int main(int argc, char *argv[]) {
 		{
 			flag=1;
 			yylex();
-			
+
 		}
 		if(strncmp(argv[1],"-1",2)==0)
 		{
 			flag=0;
-			yylex();		
+			yylex();
 		}
-		else
-		{
-			flag = - 1;
-			while(yyparse() == 0 && yylval.inteiro != EOF);
-		}
-		
-
 	}
 	if (argc == 1 )
 	{
-		flag = -1;
-		while(yyparse() == 0 && yylval.inteiro != EOF);
+		parse = -1;
+    yyparse();
 	}
-	
-	return 0;		
-			
-			
-   			
-}
 
+	return 0;
+}
 void yyerror(char* s)
 {
-	if ( flag == -1)
+	if ( parse == -1)
+  {
 		printf("Line %d, col %d: %s: %s\n", n_lines, (int)(n_column - strlen(yytext)), s, yytext);
+  }
 }
-
-
-
