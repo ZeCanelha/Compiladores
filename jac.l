@@ -2,7 +2,7 @@
 
 #include "y.tab.h"
 #include <string.h>
-  		extern int n_lines;
+  	extern int n_lines;
 		extern int n_column;
 		int st_line = 0;
 		int st_column = 0;

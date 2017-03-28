@@ -1,8 +1,7 @@
 class gcd {
  public static void main(String[] args)
  {
-  int a, b;
-  a = myFunction(b);
+  return 5*id = 5*5;
   if ((a == b));
   a = Integer.parseInt(args[0]);
   b = Integer.parseInt(args[1]);

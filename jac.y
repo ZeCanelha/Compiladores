@@ -200,22 +200,22 @@ ParseArgs: PARSEINT OCURV ID OSQUARE Expr CSQUARE CCURV
 Expr: Assignment
 	| MethodInvocation
 	| ParseArgs
-	| Expr AND Expr
-	| Expr OR Expr
-	| Expr EQ Expr
-	| Expr GEQ Expr
-	| Expr GT Expr
-	| Expr LEQ Expr
-	| Expr LT Expr
-	| Expr NEQ Expr
-	| Expr PLUS Expr
-	| Expr MINUS Expr
-	| Expr STAR Expr
-	| Expr DIV Expr
-	| Expr MOD Expr
-	| PLUS Expr
-	| MINUS Expr
-	| NOT Expr
+	| Expr AND ExprAux
+	| Expr OR ExprAux
+	| Expr EQ ExprAux
+	| Expr GT ExprAux
+  | Expr GEQ ExprAux
+	| Expr LEQ ExprAux
+	| Expr LT ExprAux
+	| Expr NEQ ExprAux
+	| Expr PLUS ExprAux
+	| Expr MINUS ExprAux
+	| Expr STAR ExprAux
+	| Expr DIV ExprAux
+	| Expr MOD ExprAux
+	| PLUS ExprAux
+	| MINUS ExprAux
+	| NOT ExprAux
 	| ID
 	| ID DOTLENGTH
 	| OCURV Expr CCURV
@@ -224,6 +224,35 @@ Expr: Assignment
 	| REALLIT
 	| OCURV error CCURV
 	;
+
+  ExprAux
+  	: MethodInvocation
+  	| ParseArgs
+  	| ExprAux AND ExprAux
+  	| ExprAux OR ExprAux
+  	| ExprAux EQ ExprAux
+  	| ExprAux GEQ ExprAux
+  	| ExprAux GT ExprAux
+  	| ExprAux LEQ ExprAux
+  	| ExprAux LT ExprAux
+  	| ExprAux NEQ ExprAux
+  	| ExprAux PLUS ExprAux
+  	| ExprAux STAR ExprAux
+    | ExprAux MINUS ExprAux
+  	| ExprAux DIV ExprAux
+  	| ExprAux MOD ExprAux
+    | PLUS ExprAux
+  	| MINUS ExprAux
+  	| NOT ExprAux
+  	| ID
+  	| ID DOTLENGTH
+  	| OCURV ExprAux CCURV
+  	| BOOLLIT
+  	| DECLIT
+  	| REALLIT
+  	| OCURV error CCURV
+  	;
+
 
 %%
 
@@ -256,5 +285,7 @@ int main(int argc, char *argv[]) {
 void yyerror(char* s)
 {
 	if ( parse == -1)
+  {
 		printf("Line %d, col %d: %s: %s\n", n_lines, (int)(n_column - strlen(yytext)), s, yytext);
+  }
 }
