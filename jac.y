@@ -237,7 +237,6 @@ int main(int argc, char *argv[]) {
 	}
 	if (argc == 1 )
 	{
-    printf("CONA\n");
 		parse = -1;
     yyparse();
 	}
