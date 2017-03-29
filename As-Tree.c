@@ -1,49 +1,52 @@
 #include "As-Tree.h"
 
+/* TYPE eg: Program */
+/* Token = value */
 
-node * new_node ( char * tipo , char * token )
+
+node_type * new_node ( char * tipo , char * token )
 {
-  node * no = (node *) malloc ( sizeof(struct node));
+  node_type * no = (node_type *) malloc ( sizeof(node_type));
 
   no->type = strdup(tipo);
   no->token = token;
   no->next_node = NULL;
   no->child_node = NULL;
-
   return no;
 }
 
-
-void add_sibiling( node * bro , node * new_bro )
+void add_child ( node_type * parent , node_type * child )
 {
-  if ( bro != NULL )
+      parent->child_node = child;
+}
+
+void add_sibiling ( node_type * first_bro , node_type * new_bro )
+{
+  if ( first_bro != NULL )
   {
-    while (bro->next_node != NULL) {
-      bro = bro->next_node;
-    }
-    bro->next_node = new_bro;
+    while( first_bro->next_node != NULL )
+      first_bro = first_bro->next_node;
+    first_bro->next_node = new_bro;
   }
 }
 
-void add_child ( node * parent , node * child )
-{
-  parent->child = child;
-}
 
-void print_tree (node * no, int n_points) {
+void print_tree (node_type * no, int n_points) {
 	int i;
-
 	if(no == NULL)
 		return;
-
 	for(i=0; i< n_points; i++)
 		printf(".");
-
-	if(no->token != NULL)
+	if(no->token != NULL )
 		printf("%s(%s)\n", no->type, no->token);
-	else
-		printf("%s\n", no->type);
+	else{
 
-	print_ast(no->child_node, n_points+2);
-	print_ast(no->next_node, n_points);
+    if ( !strcmp(no->type,"NULL") != 0);
+    else
+      printf("%s\n", no->type);
+  }
+
+
+	print_tree(no->child_node, n_points+2);
+	print_tree(no->next_node, n_points);
 }

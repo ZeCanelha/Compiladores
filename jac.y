@@ -3,8 +3,7 @@
   #include <stdio.h>
   #include <stdlib.h>
   #include <string.h>
-  #include "As-Tree.h"
-
+  #include "As-Tree.c"
 
 
   int yylex(void);
@@ -19,17 +18,15 @@
     * O nó root representa a raiz da AST.
     * O nó no_aux é um auxiliar para criar novos nós.
     */
-
-  node * root = NULL;
-  node * no_aux = NULL;
+  struct node_type * root = NULL;
+  struct node_type * no_aux = NULL;
 
 %}
 
-
 %union
 {
-    char* token;
-    node * no;
+    char * token;
+    struct node_type * no;
 }
 
 
@@ -122,108 +119,105 @@
 
 %%
 
-Program: CLASS ID OBRACE  ProgramAux  CBRACE                          {no_aux = new_node("Id",$2); $$ = new_node("Program",NULL); add_child($$,no_aux); root = $$;}
-	| CLASS ID OBRACE CBRACE                                            {}
+Program: CLASS ID OBRACE  ProgramAux  CBRACE                          {root = new_node("Program",NULL); no_aux = new_node("Id",$2);add_child(root,no_aux);add_sibiling(no_aux,$4);   }
 	;
 
-ProgramAux : FieldDecl                                                {no_aux = new_node("FieldDecl",$1);$$ = new_node("Program",NULL); add_child($$,no_aux);}
-	| MethodDecl                                                        {no_aux = new_node("MethodDecl",$1);$$ = new_node("Program",NULL); add_child($$,no_aux);}
-	| SEMI                                                              {}
-	| ProgramAux FieldDecl                                              {no_aux = $1; no_aux = no_aux->next_node; add_sibiling(no_aux,$2); $$ = $1;}
-	| ProgramAux MethodDecl                                             {no_aux = $1; no_aux = no_aux->next_node; add_sibiling(no_aux,$2); $$ = $1;}
+ProgramAux
+	: ProgramAux FieldDecl                                              {add_sibiling($1,$2); $$ = $1;}
+	| ProgramAux MethodDecl                                             {add_sibiling($1,$2); $$ = $1;}
 	| ProgramAux SEMI                                                   {$$ = $1;}
-	;
+  | %empty                                                            {$$ = new_node("NULL",NULL);}
 
 
-  FieldDecl: PUBLIC STATIC Type ID FieldDeclAux SEMI                  {}
-	| PUBLIC STATIC Type ID  SEMI                                       {}
+
+  FieldDecl
+  : PUBLIC STATIC Type ID FieldDeclAux SEMI                           {}
   | error SEMI                                                        {}
 	;
 
 FieldDeclAux
-	: COMMA ID                                                          {}
-	| FieldDeclAux COMMA ID                                             {}
-	;
-
-MethodDecl: PUBLIC STATIC MethodHeader MethodBody                    {}
+	: FieldDeclAux COMMA ID                                             {}
+  | %empty                                                            {}
   ;
-MethodHeader: Type ID OCURV CCURV                                     {}
+MethodDecl: PUBLIC STATIC MethodHeader MethodBody                     {no_aux = new_node("MethodDecl",NULL); add_child(no_aux,$3); add_sibiling($3,$4);  $$ = no_aux;  }
+  ;
+MethodHeader
+  : Type ID OCURV CCURV                                               {no_aux = new_node("MethodHeader",NULL); add_child(no_aux,new_node("Id",$2)); add_child(no_aux,new_node("Type",NULL)); $$ = no_aux;}
 	| Type  ID OCURV FormalParams CCURV                                 {}
 	| VOID ID OCURV CCURV                                               {}
-	| VOID ID OCURV FormalParams CCURV                                  {}
+	| VOID ID OCURV FormalParams CCURV                                  {no_aux = new_node("MethodHeader",NULL); add_child(no_aux,new_node("Void",NULL)); add_sibiling(no_aux->child_node,new_node("Id",$2)); add_sibiling(no_aux->child_node,$4);$$ = no_aux;}
 	;
 
 
-MethodBody: OBRACE CBRACE                                             {}
-	| OBRACE MethodBodyAux CBRACE                                       {}
+MethodBody
+	: OBRACE MethodBodyAux CBRACE                                       {}
 	;
 
 
-MethodBodyAux: VarDecl                                                {}
-	| Statement                                                          {}
-	| MethodBodyAux VarDecl                                                {}
-	| MethodBodyAux Statement                                            {}
+MethodBodyAux
+	: MethodBodyAux VarDecl                                             {}
+	| MethodBodyAux Statement                                           {}
+  | %empty                                                            {}
 	;
 
 
-FormalParams: Type ID                                                   {}
-	| Type ID FormalParamsAux                                              {}
-	| STRING OSQUARE CSQUARE ID                                           {}
+FormalParams
+	: Type ID FormalParamsAux                                           {}
+	| STRING OSQUARE CSQUARE ID                                         {}
 	;
 
 
 FormalParamsAux
-	: FormalParamsAux COMMA Type ID                                      {}
-	| COMMA Type ID                                                      {}
+	: FormalParamsAux COMMA Type ID                                     {}
+	| %empty                                                            {}
 	;
 
 
 VarDecl
-	: Type ID FieldDeclAux SEMI                                          {}
-	| Type ID SEMI                                                       {}
+	: Type ID FieldDeclAux SEMI                                         {}
 	;
 
-Type: BOOL                                                              {}
-	| INT                                                                {}
-	| DOUBLE                                                             {}
+Type: BOOL                                                            {}
+	| INT                                                               {}
+	| DOUBLE                                                            {}
 	;
 
-Statement: OBRACE StatementAux CBRACE                                   {}
-  | OBRACE CBRACE                                                       {}
-	| IF OCURV Expr CCURV Statement %prec NO_ELSE                          {}
-	| IF OCURV Expr CCURV Statement ELSE Statement                         {}
-	| WHILE OCURV Expr CCURV Statement                                     {}
-	| DO Statement WHILE OCURV Expr CCURV SEMI                             {}
-	| PRINT OCURV Expr CCURV SEMI                                          {}
-	| PRINT OCURV STRLIT CCURV SEMI                                        {}
-	| SEMI                                                                 {}
-	| Assignment SEMI                                                      {}
-  | Assignment ParseArgs SEMI                                             {}
-  | Assignment MethodInvocation SEMI                                      {}
-  | Assignment MethodInvocation ParseArgs SEMI                            {}
-	| MethodInvocation SEMI                                                {}
-  | MethodInvocation ParseArgs SEMI                                       {}
-	| ParseArgs SEMI                                                       {}
-	| RETURN  SEMI                                                         {}
-	| RETURN  Expr SEMI                                                    {}
-	| error SEMI                                                           {}
+Statement: OBRACE StatementAux CBRACE                                 {}
+	| IF OCURV Expr CCURV Statement %prec NO_ELSE                       {}
+	| IF OCURV Expr CCURV Statement ELSE Statement                      {}
+	| WHILE OCURV Expr CCURV Statement                                  {}
+	| DO Statement WHILE OCURV Expr CCURV SEMI                          {}
+	| PRINT OCURV Expr CCURV SEMI                                       {}
+	| PRINT OCURV STRLIT CCURV SEMI                                     {}
+	| SEMI                                                              {}
+	| Assignment SEMI                                                   {}
+  | Assignment ParseArgs SEMI                                         {}
+  | Assignment MethodInvocation SEMI                                  {}
+  | Assignment MethodInvocation ParseArgs SEMI                        {}
+	| MethodInvocation SEMI                                             {}
+  | MethodInvocation ParseArgs SEMI                                   {}
+	| ParseArgs SEMI                                                    {}
+	| RETURN  SEMI                                                      {}
+	| RETURN  Expr SEMI                                                 {}
+	| error SEMI                                                        {}
 	;
 
-StatementAux: Statement                                                   {}
-	| StatementAux Statement                                                 {}
-	;
-
-Assignment: ID ASSIGN Expr                  {}
+StatementAux
+	: StatementAux Statement                                            {}
+  | %empty                                                            {}
   ;
 
-MethodInvocation: ID OCURV CCURV                                          {}
-  | ID OCURV Expr CCURV                                                   {}
-	| ID OCURV Expr MethodInvocationAux CCURV                               {}
-	| ID OCURV error CCURV                                                  {}
+Assignment: ID ASSIGN Expr                                            {}
+  ;
+
+MethodInvocation: ID OCURV CCURV                                      {}
+	| ID OCURV Expr MethodInvocationAux CCURV                           {}
+	| ID OCURV error CCURV                                              {}
 	;
 
-MethodInvocationAux : COMMA Expr                                          {}
-	| MethodInvocationAux COMMA Expr                                        {}
+MethodInvocationAux
+	: MethodInvocationAux COMMA Expr                                    {}
+  | %empty                                                            {}
 	;
 
 
@@ -310,6 +304,8 @@ int main(int argc, char *argv[]) {
 		}
     if ( strncmp(argv[1],"-t",2) == 0)
     {
+      parse = -1;
+      yyparse();
       print_tree(root,0);
     }
 
