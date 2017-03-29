@@ -6,12 +6,15 @@ typedef struct node node;
 
 typedef struct node
 {
-  int value;
+  char * type;
   char * token;
   node * next_node;
   node * child_node;
 }
 
-node * new_node(char *, int );
-void * add_sibiling( node *, char * , int);
-void * add_child( node * , char * , int );
+/* TO DO: Enum para nao comparar as strings */
+
+node * new_node(char *, char *);
+void  add_sibiling( node *, node *);
+void  add_child( node * , node *);
+void print_tree ( node * , int );
