@@ -17,6 +17,8 @@ node_type * new_node ( char * tipo , char * token )
 
 void add_child ( node_type * parent , node_type * child )
 {
+  if ( parent != NULL)
+    if (parent->child_node == NULL)
       parent->child_node = child;
 }
 

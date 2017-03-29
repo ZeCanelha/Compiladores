@@ -119,7 +119,7 @@
 
 %%
 
-Program: CLASS ID OBRACE  ProgramAux  CBRACE                          {root = new_node("Program",NULL); no_aux = new_node("Id",$2);add_child(root,no_aux);add_sibiling(no_aux,$4);   }
+Program: CLASS ID OBRACE  ProgramAux  CBRACE                          {no_aux = new_node("Id",$2);root = new_node("Program",NULL);add_sibiling(no_aux,$4);add_child(root,no_aux);}
 	;
 
 ProgramAux
@@ -143,27 +143,27 @@ MethodDecl: PUBLIC STATIC MethodHeader MethodBody                     {no_aux = 
   ;
 MethodHeader
   : Type ID OCURV CCURV                                               {no_aux = new_node("MethodHeader",NULL); add_child(no_aux,new_node("Id",$2)); add_child(no_aux,new_node("Type",NULL)); $$ = no_aux;}
-	| Type  ID OCURV FormalParams CCURV                                 {}
-	| VOID ID OCURV CCURV                                               {}
+	| Type ID OCURV FormalParams CCURV                                  {}
+	| VOID ID OCURV CCURV                                               {no_aux = new_node("MethodHeader", NULL); add_child(no_aux,new_node("Id",$2)); $$ = no_aux;}
 	| VOID ID OCURV FormalParams CCURV                                  {no_aux = new_node("MethodHeader",NULL); add_child(no_aux,new_node("Void",NULL)); add_sibiling(no_aux->child_node,new_node("Id",$2)); add_sibiling(no_aux->child_node,$4);$$ = no_aux;}
 	;
 
 
 MethodBody
-	: OBRACE MethodBodyAux CBRACE                                       {}
+	: OBRACE MethodBodyAux CBRACE                                       {no_aux = new_node("MethodBody",NULL); add_child(no_aux,$2); $$ = no_aux;}
 	;
 
 
 MethodBodyAux
-	: MethodBodyAux VarDecl                                             {}
-	| MethodBodyAux Statement                                           {}
-  | %empty                                                            {}
+	: MethodBodyAux VarDecl                                             {add_sibiling($1,$2); $$ = $1;}
+	| MethodBodyAux Statement                                           {add_sibiling($1,$2); $$ = $1;}
+  | %empty                                                            {$$ = new_node("NULL",NULL);}
 	;
 
 
 FormalParams
-	: Type ID FormalParamsAux                                           {}
-	| STRING OSQUARE CSQUARE ID                                         {}
+	: Type ID FormalParamsAux                                           {no_aux = new_node("MethodParams",NULL); add_child(no_aux,new_node("Type",$1)); add_sibiling(no_aux->child_node,new_node("Id",$2)); $$ = no_aux;}
+	| STRING OSQUARE CSQUARE ID                                         {no_aux = new_node("MethodParams", NULL); add_child(no_aux,new_node("Id",$4)); $$ = no_aux;}
 	;
 
 
