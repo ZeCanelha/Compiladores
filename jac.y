@@ -195,7 +195,7 @@ Statement: OBRACE StatementAux CBRACE                                 {}
 	| DO Statement WHILE OCURV Expr CCURV SEMI                          {}
 	| PRINT OCURV Expr CCURV SEMI                                       {}
 	| PRINT OCURV STRLIT CCURV SEMI                                     {}
-	| SEMI                                                              {}
+	| SEMI                                                              {$$ = NULL;}
 	| Assignment SEMI                                                   {}
   | Assignment ParseArgs SEMI                                         {}
   | Assignment MethodInvocation SEMI                                  {}
@@ -233,31 +233,7 @@ ParseArgs: PARSEINT OCURV ID OSQUARE Expr CSQUARE CCURV                    {}
 
 
 Expr: Assignment                                                            {}
-	| MethodInvocation                                                        {}
-	| ParseArgs                                                               {}
-	| Expr AND ExprAux                                                        {}
-	| Expr OR ExprAux                                                         {}
-	| Expr EQ ExprAux                                                         {}
-	| Expr GT ExprAux                                                         {}
-  | Expr GEQ ExprAux                                                        {}
-	| Expr LEQ ExprAux                                                        {}
-	| Expr LT ExprAux                                                         {}
-	| Expr NEQ ExprAux                                                        {}
-	| Expr PLUS ExprAux                                                       {}
-	| Expr MINUS ExprAux                                                      {}
-	| Expr STAR ExprAux                                                       {}
-	| Expr DIV ExprAux                                                        {}
-	| Expr MOD ExprAux                                                        {}
-	| PLUS ExprAux                                                            {}
-	| MINUS ExprAux                                                           {}
-	| NOT ExprAux                                                             {}
-	| ID                                                                      {}
-	| ID DOTLENGTH                                                            {}
-	| OCURV Expr CCURV                                                        {}
-	| BOOLLIT                                                                 {}
-	| DECLIT                                                                  {}
-	| REALLIT                                                                 {}
-	| OCURV error CCURV                                                       {}
+	| ExprAux
 	;
 
   ExprAux
