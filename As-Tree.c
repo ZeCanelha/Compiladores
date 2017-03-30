@@ -1,5 +1,5 @@
 #include "As-Tree.h"
-
+#include <string.h>
 /* TYPE eg: Program */
 /* Token = value */
 
@@ -37,15 +37,21 @@ void print_tree (node_type * no, int n_points) {
 	int i;
 	if(no == NULL)
 		return;
-	for(i=0; i< n_points; i++)
-		printf(".");
-	if(no->token != NULL )
+
+	if(no->token != NULL ){
+    for(i=0; i< n_points; i++)
+		  printf(".");
 		printf("%s(%s)\n", no->type, no->token);
+  }
 	else{
 
     if ( !strcmp(no->type,"NULL") != 0);
-    else
+    else{
+      for(i=0; i< n_points; i++)
+        printf(".");
       printf("%s\n", no->type);
+    }
+
   }
 
 

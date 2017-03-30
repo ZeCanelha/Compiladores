@@ -1,0 +1,8 @@
+class main{
+  public static int b()
+  {
+    int a,b,c,d;
+  }
+  public static boolean d(){}
+  public static void a(){}
+}

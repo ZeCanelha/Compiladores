@@ -722,6 +722,7 @@ char *yytext;
 #line 2 "jac.l"
 
 #include "y.tab.h"
+#include "As-Tree.h"
 #include <string.h>
   	extern int n_lines;
 		extern int n_column;
@@ -733,7 +734,7 @@ char *yytext;
 
 
 
-#line 737 "lex.yy.c"
+#line 738 "lex.yy.c"
 
 #define INITIAL 0
 #define COMMENT_B 1
@@ -954,9 +955,9 @@ YY_DECL
 		}
 
 	{
-#line 68 "jac.l"
+#line 69 "jac.l"
 
-#line 960 "lex.yy.c"
+#line 961 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1016,330 +1017,330 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 69 "jac.l"
+#line 70 "jac.l"
 {n_column = 1;n_lines++;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 70 "jac.l"
+#line 71 "jac.l"
 {n_column+=yyleng;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 71 "jac.l"
+#line 72 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("BOOL\n");} if( parse == -1 ){RETURN_TOKEN(BOOL);};}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 72 "jac.l"
+#line 73 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("BOOLLIT(%s)\n",yytext);} if( parse == -1 ){RETURN_TOKEN(BOOLLIT);};}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 73 "jac.l"
+#line 74 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("CLASS\n");}  if( parse == -1 ){RETURN_TOKEN(CLASS);};}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 74 "jac.l"
+#line 75 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("DO\n");}  if( parse == -1 ){RETURN_TOKEN(DO);};}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 75 "jac.l"
+#line 76 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("DOTLENGTH\n");}  if( parse == -1 ){RETURN_TOKEN(DOTLENGTH);};}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 76 "jac.l"
+#line 77 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("DOUBLE\n");}  if( parse == -1 ){RETURN_TOKEN(DOUBLE);};}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 77 "jac.l"
+#line 78 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("ELSE\n");}if( parse == -1 ){RETURN_TOKEN(ELSE);};}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 78 "jac.l"
+#line 79 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("IF\n");}if( parse == -1 ){RETURN_TOKEN(IF);};}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 79 "jac.l"
+#line 80 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("INT\n");} if( parse == -1 ){RETURN_TOKEN(INT);};}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 80 "jac.l"
+#line 81 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("PARSEINT\n");} if( parse == -1 ) {RETURN_TOKEN(PARSEINT);};}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 81 "jac.l"
+#line 82 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("PRINT\n");} if( parse == -1 ) {RETURN_TOKEN(PRINT);};}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 82 "jac.l"
+#line 83 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("PUBLIC\n");} if( parse == -1 ) {RETURN_TOKEN(PUBLIC);};}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 83 "jac.l"
+#line 84 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("RETURN\n");} if( parse == -1 ) {RETURN_TOKEN(RETURN);};}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 84 "jac.l"
+#line 85 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("STATIC\n");} if( parse == -1 ) {RETURN_TOKEN(STATIC);};}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 85 "jac.l"
+#line 86 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("STRING\n");} if( parse == -1 ) {RETURN_TOKEN(STRING);};}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 86 "jac.l"
+#line 87 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("VOID\n");}  if( parse == -1 ){RETURN_TOKEN(VOID);};}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 87 "jac.l"
+#line 88 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("WHILE\n");}  if( parse == -1 ){RETURN_TOKEN(WHILE);};}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 88 "jac.l"
+#line 89 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("OCURV\n");}  if( parse == -1 ){RETURN_TOKEN(OCURV);};}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 89 "jac.l"
+#line 90 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("CCURV\n");}  if( parse == -1 ){RETURN_TOKEN(CCURV);};}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 90 "jac.l"
+#line 91 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("OBRACE\n");}  if( parse == -1 ){RETURN_TOKEN(OBRACE);};}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 91 "jac.l"
+#line 92 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("CBRACE\n");}  if( parse == -1 ){RETURN_TOKEN(CBRACE);};}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 92 "jac.l"
+#line 93 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("OSQUARE\n");}  if( parse == -1 ){RETURN_TOKEN(OSQUARE);};}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 93 "jac.l"
+#line 94 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("CSQUARE\n");}  if( parse == -1 ){RETURN_TOKEN(CSQUARE);};}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 94 "jac.l"
+#line 95 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("AND\n");}  if( parse == -1 ){RETURN_TOKEN(AND);};}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 95 "jac.l"
+#line 96 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("OR\n");}  if( parse == -1 ){RETURN_TOKEN(OR);};}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 96 "jac.l"
+#line 97 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("LT\n");}  if( parse == -1 ){RETURN_TOKEN(LT);};}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 97 "jac.l"
+#line 98 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("GT\n");}  if( parse == -1 ){RETURN_TOKEN(GT);};}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 98 "jac.l"
+#line 99 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("EQ\n");}  if( parse == -1 ){RETURN_TOKEN(EQ);};}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 99 "jac.l"
+#line 100 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("NEQ\n");}  if( parse == -1 ){RETURN_TOKEN(NEQ);};}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 100 "jac.l"
+#line 101 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("LEQ\n");}  if( parse == -1 ){RETURN_TOKEN(LEQ);};}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 101 "jac.l"
+#line 102 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("GEQ\n");}  if( parse == -1 ){RETURN_TOKEN(GEQ);};}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 102 "jac.l"
+#line 103 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("PLUS\n");}  if( parse == -1 ){RETURN_TOKEN(PLUS);};}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 103 "jac.l"
+#line 104 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("MINUS\n");}  if( parse == -1 ){RETURN_TOKEN(MINUS);};}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 104 "jac.l"
+#line 105 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("STAR\n");}  if( parse == -1 ){RETURN_TOKEN(STAR);};}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 105 "jac.l"
+#line 106 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("DIV\n");}  if( parse == -1 ){RETURN_TOKEN(DIV);};}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 106 "jac.l"
+#line 107 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("MOD\n");}  if( parse == -1 ){RETURN_TOKEN(MOD);};}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 107 "jac.l"
+#line 108 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("NOT\n");}  if( parse == -1 ){RETURN_TOKEN(NOT);};}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 108 "jac.l"
+#line 109 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("ASSIGN\n");}  if( parse == -1 ){RETURN_TOKEN(ASSIGN);};}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 109 "jac.l"
+#line 110 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("SEMI\n");}  if( parse == -1 ){RETURN_TOKEN(SEMI);};}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 110 "jac.l"
+#line 111 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("COMMA\n");}  if( parse == -1 ){RETURN_TOKEN(COMMA);};}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 111 "jac.l"
+#line 112 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("RESERVED(%s)\n",yytext);}  if( parse == -1 ){RETURN_TOKEN(RESERVED);};}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 112 "jac.l"
+#line 113 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("ID(%s)\n",yytext);}  if( parse == -1 ){RETURN_TOKEN(ID);};}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 113 "jac.l"
+#line 114 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("REALLIT(%s)\n",yytext);} if( parse == -1 ) {RETURN_TOKEN(REALLIT);};}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 114 "jac.l"
+#line 115 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("DECLIT(%s)\n",yytext);}  if( parse == -1 ){RETURN_TOKEN(DECLIT);};}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 115 "jac.l"
+#line 116 "jac.l"
 {n_column+=yyleng; if (flag == 1){printf("STRLIT(%s)\n",yytext);}  if( parse == -1 ){RETURN_TOKEN(STRLIT);};}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 117 "jac.l"
+#line 118 "jac.l"
 {BEGIN COMMENT;st_line = n_lines;st_column = n_column;n_column+=yyleng;}
 	YY_BREAK
 case 49:
 /* rule 49 can match eol */
 YY_RULE_SETUP
-#line 118 "jac.l"
+#line 119 "jac.l"
 {n_column = 1;n_lines++;}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 119 "jac.l"
+#line 120 "jac.l"
 {BEGIN 0;n_column+=yyleng;}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 120 "jac.l"
+#line 121 "jac.l"
 {n_column+=yyleng;}
 	YY_BREAK
 case YY_STATE_EOF(COMMENT):
-#line 121 "jac.l"
+#line 122 "jac.l"
 {printf("Line %d, col %d: unterminated comment\n",st_line,st_column);BEGIN 0;}
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 123 "jac.l"
+#line 124 "jac.l"
 {BEGIN COMMENT_B;n_column+=yyleng;}
 	YY_BREAK
 case 53:
 /* rule 53 can match eol */
 YY_RULE_SETUP
-#line 124 "jac.l"
+#line 125 "jac.l"
 {BEGIN 0;n_column = 1;n_lines++;}
 	YY_BREAK
 case YY_STATE_EOF(COMMENT_B):
-#line 125 "jac.l"
+#line 126 "jac.l"
 {BEGIN 0;}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 126 "jac.l"
+#line 127 "jac.l"
 {n_column+=yyleng;}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 129 "jac.l"
+#line 130 "jac.l"
 {BEGIN STRING_ESCAPE;st_line = n_lines;st_column = n_column;n_column+=yyleng;}
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 130 "jac.l"
+#line 131 "jac.l"
 {n_column+=yyleng;}
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 131 "jac.l"
+#line 132 "jac.l"
 {BEGIN 0 ;n_column+=yyleng;}
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 132 "jac.l"
+#line 133 "jac.l"
 {printf("Line %d, col %d: invalid escape sequence (%s)\n",n_lines,n_column,yytext);n_column+=yyleng;BEGIN STRING_ESCAPE;}
 	YY_BREAK
 case 59:
 /* rule 59 can match eol */
 YY_RULE_SETUP
-#line 133 "jac.l"
+#line 134 "jac.l"
 {printf("Line %d, col %d: unterminated string literal\n", n_lines, st_column);n_lines++;n_column=1;BEGIN 0;}
 	YY_BREAK
 case YY_STATE_EOF(STRING_ESCAPE):
-#line 134 "jac.l"
+#line 135 "jac.l"
 {printf("Line %d, col %d: unterminated string literal\n", n_lines, n_column);BEGIN 0;}
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 135 "jac.l"
+#line 136 "jac.l"
 {n_column+=yyleng;}
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 138 "jac.l"
+#line 139 "jac.l"
 {printf("Line %d, col %d: illegal character (%s)\n",n_lines,n_column,yytext);n_column+=yyleng;}
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 141 "jac.l"
+#line 142 "jac.l"
 ECHO;
 	YY_BREAK
-#line 1343 "lex.yy.c"
+#line 1344 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2340,7 +2341,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 141 "jac.l"
+#line 142 "jac.l"
 
 
 

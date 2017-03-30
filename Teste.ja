@@ -1,0 +1,4 @@
+class id{
+  public static int a;
+  public static int q;
+}

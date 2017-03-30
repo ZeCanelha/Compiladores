@@ -1,6 +1,7 @@
 %{
 
 #include "y.tab.h"
+#include "As-Tree.h"
 #include <string.h>
   	extern int n_lines;
 		extern int n_column;

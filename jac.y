@@ -3,7 +3,7 @@
   #include <stdio.h>
   #include <stdlib.h>
   #include <string.h>
-  #include "As-Tree.c"
+  #include "As-Tree.h"
 
 
   int yylex(void);
@@ -14,12 +14,11 @@
   int flag = 0 ;
   int parse = 0;
 
-  /*
-    * O nó root representa a raiz da AST.
-    * O nó no_aux é um auxiliar para criar novos nós.
-    */
+
   struct node_type * root = NULL;
   struct node_type * no_aux = NULL;
+  struct node_type * aux = NULL;
+  char string_type[15];
 
 %}
 
@@ -90,6 +89,7 @@
 %type <no> FormalParams
 %type <no> FormalParamsAux
 %type <no> VarDecl
+%type <no> VarDeclAux
 %type <no> Type
 %type <no> Statement
 %type <no> StatementAux
@@ -131,21 +131,22 @@ ProgramAux
 
 
   FieldDecl
-  : PUBLIC STATIC Type ID FieldDeclAux SEMI                           {}
+  : PUBLIC STATIC Type ID FieldDeclAux SEMI                           {no_aux = new_node("FieldDecl",NULL); add_child(no_aux,$3); add_sibiling(no_aux->child_node,new_node("Id",$4)); add_sibiling(no_aux,$5); $$ = no_aux;}
+  | PUBLIC STATIC Type ID SEMI                                        {no_aux = new_node("FieldDecl",NULL); add_child(no_aux,$3); add_sibiling(no_aux->child_node,new_node("Id",$4)); $$ = no_aux;}
   | error SEMI                                                        {}
 	;
 
 FieldDeclAux
-	: FieldDeclAux COMMA ID                                             {}
-  | %empty                                                            {}
+	: COMMA ID FieldDeclAux                                              {no_aux = new_node("FieldDecl", NULL); add_child(no_aux,new_node(string_type,NULL)); add_sibiling(no_aux->child_node,new_node("Id",$2)); add_sibiling(no_aux,$3); $$ = no_aux;}
+  | COMMA ID                                                           {no_aux = new_node("FieldDecl", NULL); add_child(no_aux,new_node(string_type,NULL)); add_sibiling(no_aux->child_node,new_node("Id",$2)); $$ = no_aux;}
   ;
 MethodDecl: PUBLIC STATIC MethodHeader MethodBody                     {no_aux = new_node("MethodDecl",NULL); add_child(no_aux,$3); add_sibiling($3,$4);  $$ = no_aux;  }
   ;
 MethodHeader
-  : Type ID OCURV CCURV                                               {no_aux = new_node("MethodHeader",NULL); add_child(no_aux,new_node("Id",$2)); add_child(no_aux,new_node("Type",NULL)); $$ = no_aux;}
-	| Type ID OCURV FormalParams CCURV                                  {}
-	| VOID ID OCURV CCURV                                               {no_aux = new_node("MethodHeader", NULL); add_child(no_aux,new_node("Id",$2)); $$ = no_aux;}
-	| VOID ID OCURV FormalParams CCURV                                  {no_aux = new_node("MethodHeader",NULL); add_child(no_aux,new_node("Void",NULL)); add_sibiling(no_aux->child_node,new_node("Id",$2)); add_sibiling(no_aux->child_node,$4);$$ = no_aux;}
+  : Type ID OCURV CCURV                                               {no_aux = new_node("MethodHeader",NULL); add_child(no_aux,$1); add_sibiling(no_aux->child_node,new_node("Id",$2));add_sibiling($1,new_node("MethodParams",NULL)); $$ = no_aux;}
+	| Type ID OCURV FormalParams CCURV                                  {no_aux = new_node("MethodHeader",NULL); add_child(no_aux,$1); aux = new_node("MethodParams",NULL); add_sibiling(no_aux->child_node,new_node("Id",$2));add_sibiling($1,aux);add_child(aux,$4); $$ = no_aux;}
+	| VOID ID OCURV CCURV                                               {no_aux = new_node("MethodHeader", NULL); add_child(no_aux,new_node("Void",NULL));add_sibiling(no_aux->child_node,new_node("Id",$2)); add_sibiling(no_aux->child_node,new_node("MethodParams",NULL));$$ = no_aux;}
+	| VOID ID OCURV FormalParams CCURV                                  {no_aux = new_node("MethodHeader",NULL); add_child(no_aux,new_node("Void",NULL)); aux = new_node("MethodParams",NULL); add_sibiling(no_aux->child_node,new_node("Id",$2)); add_sibiling(no_aux->child_node,aux); add_child(aux,$4);$$ = no_aux;}
 	;
 
 
@@ -156,30 +157,35 @@ MethodBody
 
 MethodBodyAux
 	: MethodBodyAux VarDecl                                             {add_sibiling($1,$2); $$ = $1;}
-	| MethodBodyAux Statement                                           {add_sibiling($1,$2); $$ = $1;}
+  | MethodBodyAux Statement                                           {/*add_sibiling($1,$2); $$ = $1;*/}
   | %empty                                                            {$$ = new_node("NULL",NULL);}
 	;
 
 
 FormalParams
-	: Type ID FormalParamsAux                                           {no_aux = new_node("MethodParams",NULL); add_child(no_aux,new_node("Type",$1)); add_sibiling(no_aux->child_node,new_node("Id",$2)); $$ = no_aux;}
-	| STRING OSQUARE CSQUARE ID                                         {no_aux = new_node("MethodParams", NULL); add_child(no_aux,new_node("Id",$4)); $$ = no_aux;}
-	;
-
+	: Type ID FormalParamsAux                                           {no_aux = new_node("ParamDecl",NULL);add_child(no_aux,$1);add_sibiling($1,new_node("Id",$2));add_sibiling(no_aux,$3); $$ = no_aux;}
+	| STRING OSQUARE CSQUARE ID                                         {no_aux = new_node("ParamDecl",NULL);add_child(no_aux,new_node("StringArray",NULL)); add_sibiling(no_aux->child_node,new_node("Id",$4)); $$ = no_aux;}
+  | Type ID                                                           {no_aux = new_node("ParamDecl",NULL);add_child(no_aux,$1); add_sibiling($1,new_node("Id",$2)); $$ = no_aux; }
+  ;
 
 FormalParamsAux
-	: FormalParamsAux COMMA Type ID                                     {}
-	| %empty                                                            {}
+	: COMMA Type ID FormalParamsAux                                     {no_aux = new_node("ParamDecl",NULL); add_child(no_aux,$2); add_sibiling($2,new_node("Id",$3));add_sibiling(no_aux,$4); $$ = no_aux;}
+	| COMMA Type ID                                                     {no_aux = new_node("ParamDecl",NULL); add_child(no_aux,$2); add_sibiling($2,new_node("Id",$3)); $$ = no_aux;}
 	;
 
 
 VarDecl
-	: Type ID FieldDeclAux SEMI                                         {}
-	;
+	: Type ID VarDeclAux SEMI                                          {no_aux = new_node("VarDecl",NULL); add_child(no_aux,$1);add_sibiling(no_aux->child_node,new_node("Id",$2)); add_sibiling(no_aux,$3);$$ = no_aux;}
+  | Type ID SEMI                                                     {no_aux = new_node("VarDecl",NULL); add_child(no_aux,$1); add_sibiling($1,new_node("Id",$2)); $$ = no_aux;}
+  ;
+VarDeclAux
+  : COMMA ID VarDeclAux                                              {no_aux = new_node("VarDecl",NULL); add_child(no_aux,new_node(string_type,NULL));add_sibiling(no_aux->child_node,new_node("Id",$2));add_sibiling(no_aux,$3);$$ = no_aux;}
+  | COMMA ID                                                         {no_aux = new_node("VarDecl",NULL); add_child(no_aux,new_node(string_type,NULL)); add_sibiling(no_aux->child_node,new_node("Id",$2)); $$ = no_aux;}
+  ;
 
-Type: BOOL                                                            {}
-	| INT                                                               {}
-	| DOUBLE                                                            {}
+Type: BOOL                                                            {$$ = new_node("Bool",NULL);strcpy(string_type,"Bool");}
+	| INT                                                               {$$ = new_node("Int",NULL);strcpy(string_type,"Int");}
+	| DOUBLE                                                            {$$ = new_node("Double",NULL);strcpy(string_type,"Double");}
 	;
 
 Statement: OBRACE StatementAux CBRACE                                 {}
