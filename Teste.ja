@@ -1,4 +1,10 @@
 class id{
-  public static int a;
-  public static int q;
+  public static int b()
+  {
+    if ( a = 1 )
+    {
+      return a;
+      return b;
+    }
+  }
 }
