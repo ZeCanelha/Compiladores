@@ -1,76 +1,111 @@
 %{
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <string.h>
+  #include "As-Tree.h"
 
-int yylex(void);
-void yyerror(char* s);
-int n_lines = 1;
-int n_column = 1;
-extern char* yytext;
-int flag = 0 ;
-int parse = 0;
+
+  int yylex(void);
+  void yyerror(char* s);
+  int n_lines = 1;
+  int n_column = 1;
+  extern char* yytext;
+  int flag = 0 ;
+  int parse = 0;
+  int syntax_flag = 0;
+
+
+  struct node_type * root = NULL;
+  struct node_type * no_aux = NULL;
+  struct node_type * aux = NULL;
+  struct node_type * aux1 = NULL;
+  struct node_type * aux2 = NULL;
+  char string_type[15];
 
 %}
 
-
 %union
 {
-    char* token;
-    int inteiro;
+    char * token;
+    struct node_type * no;
 }
-
 
 
 
 %token <token> BOOL
 %token <token> BOOLLIT
-%token <token> CLASS
-%token <token> DO
-%token <token> DOTLENGTH
-%token <token> DOUBLE
-%token <token> ELSE
-%token <token> IF
-%token <token> INT
-%token <token> PARSEINT
-%token <token> PRINT
-%token <token> PUBLIC
-%token <token> RETURN
-%token <token> STATIC
-%token <token> STRING
-%token <token> VOID
-%token <token> WHILE
-%token <token> OCURV
-%token <token> CCURV
-%token <token> OBRACE
-%token <token> CBRACE
-%token <token> OSQUARE
-%token <token> CSQUARE
-%token <token> AND
-%token <token> OR
-%token <token> LT
-%token <token> GT
-%token <token> LEQ
-%token <token> GEQ
-%token <token> PLUS
-%token <token> MINUS
-%token <token> STAR
-%token <token> DIV
-%token <token> MOD
-%token <token> NOT
-%token <token> ASSIGN
-%token <token> SEMI
-%token <token> COMMA
-%token <token> RESERVED
+%token  CLASS
+%token  DO
+%token  DOTLENGTH
+%token  DOUBLE
+%token  ELSE
+%token  IF
+%token  INT
+%token  PARSEINT
+%token  PRINT
+%token  PUBLIC
+%token  RETURN
+%token  STATIC
+%token  STRING
+%token  VOID
+%token  WHILE
+%token  OCURV
+%token  CCURV
+%token  OBRACE
+%token  CBRACE
+%token  OSQUARE
+%token  CSQUARE
+%token  AND
+%token  OR
+%token  LT
+%token  GT
+%token  EQ
+%token  NEQ
+%token  LEQ
+%token  GEQ
+%token  PLUS
+%token  MINUS
+%token  STAR
+%token  DIV
+%token  MOD
+%token  NOT
+%token  ASSIGN
+%token  SEMI
+%token  COMMA
+%token  RESERVED
 %token <token> ID
 %token <token> REALLIT
 %token <token> DECLIT
 %token <token> STRLIT
 
 
-%nonassoc NO_ELSE
-%nonassoc ELSE
+
+
+%type <no> Program
+%type <no> ProgramAux
+%type <no> FieldDecl
+%type <no> FieldDeclAux
+%type <no> MethodDecl
+%type <no> MethodHeader
+%type <no> MethodBody
+%type <no> MethodBodyAux
+%type <no> FormalParams
+%type <no> FormalParamsAux
+%type <no> VarDecl
+%type <no> VarDeclAux
+%type <no> Type
+%type <no> Statement
+%type <no> StatementAux
+%type <no> Assignment
+%type <no> MethodInvocation
+%type <no> MethodInvocationAux
+%type <no> ParseArgs
+%type <no> Expr
+%type <no> ExprAux
+
+
+
 
 
 %start Program
@@ -86,171 +121,286 @@ int parse = 0;
 %right PRECEDENCE
 %left OBRACE OCURV OSQUARE CCURV CSQUARE CBRACE
 
+%nonassoc NO_ELSE
+%nonassoc ELSE
+
 %%
 
-Program: CLASS ID OBRACE  ProgramAux  CBRACE
-	| CLASS ID OBRACE CBRACE
-	;
+Program: CLASS ID OBRACE  ProgramAux  CBRACE                          {if(syntax_flag != 1){no_aux = new_node("Id",$2);root = new_node("Program",NULL);add_sibiling(no_aux,$4);add_child(root,no_aux);}}
+  | CLASS ID OBRACE  CBRACE                                           {if(syntax_flag != 1){no_aux = new_node("Id",$2);root = new_node("Program",NULL);add_child(root,no_aux);}}
+  ;
 
-ProgramAux : FieldDecl
-	| MethodDecl
-	| SEMI
-	| ProgramAux FieldDecl
-	| ProgramAux MethodDecl
-	| ProgramAux SEMI
-	;
+ProgramAux
+	: ProgramAux FieldDecl                                              {if(syntax_flag != 1){add_sibiling($1,$2); $$ = $1;}}
+	| ProgramAux MethodDecl                                             {if(syntax_flag != 1){add_sibiling($1,$2); $$ = $1;}}
+	| ProgramAux SEMI                                                   {if(syntax_flag != 1){$$ = $1;}}
+  | FieldDecl                                                         {if ( syntax_flag != 1){$$ = $1;}}
+  | MethodDecl                                                        {if ( syntax_flag != 1){$$ = $1;}};
+  | SEMI                                                              {if ( syntax_flag != 1){$$ = NULL;}}
+  ;
 
 
-FieldDecl: PUBLIC STATIC Type ID FieldDeclAux SEMI
-	| PUBLIC STATIC Type ID  SEMI
-  | error SEMI
+  FieldDecl
+  : PUBLIC STATIC Type ID FieldDeclAux SEMI                           {if(syntax_flag != 1){no_aux = new_node("FieldDecl",NULL); add_child(no_aux,$3); add_sibiling(no_aux->child_node,new_node("Id",$4)); add_sibiling(no_aux,$5); $$ = no_aux;}}
+  | PUBLIC STATIC Type ID SEMI                                        {if(syntax_flag != 1){no_aux = new_node("FieldDecl",NULL); add_child(no_aux,$3); add_sibiling(no_aux->child_node,new_node("Id",$4)); $$ = no_aux;}}
+  | error SEMI                                                        {$$ = NULL;}
 	;
 
 FieldDeclAux
-	: COMMA ID
-	| FieldDeclAux COMMA ID
-	;
-
-MethodDecl: PUBLIC STATIC MethodHeader MethodBody ;
-
-MethodHeader: Type ID OCURV CCURV
-	| Type  ID OCURV FormalParams CCURV
-	| VOID ID OCURV CCURV
-	| VOID ID OCURV FormalParams CCURV
-	;
-
-
-MethodBody: OBRACE CBRACE
-	| OBRACE MethodBodyAux CBRACE
+	: COMMA ID FieldDeclAux                                              {if(syntax_flag != 1){no_aux = new_node("FieldDecl", NULL); add_child(no_aux,new_node(string_type,NULL)); add_sibiling(no_aux->child_node,new_node("Id",$2)); add_sibiling(no_aux,$3); $$ = no_aux;}}
+  | COMMA ID                                                           {if(syntax_flag != 1){no_aux = new_node("FieldDecl", NULL); add_child(no_aux,new_node(string_type,NULL)); add_sibiling(no_aux->child_node,new_node("Id",$2)); $$ = no_aux;}}
+  ;
+MethodDecl: PUBLIC STATIC MethodHeader MethodBody                     {if(syntax_flag != 1){no_aux = new_node("MethodDecl",NULL); add_child(no_aux,$3); add_sibiling($3,$4);  $$ = no_aux;}}
+  ;
+MethodHeader
+  : Type ID OCURV CCURV                                               {if(syntax_flag != 1){no_aux = new_node("MethodHeader",NULL); add_child(no_aux,$1); add_sibiling(no_aux->child_node,new_node("Id",$2));add_sibiling($1,new_node("MethodParams",NULL)); $$ = no_aux;}}
+	| Type ID OCURV FormalParams CCURV                                  {if(syntax_flag != 1){no_aux = new_node("MethodHeader",NULL); add_child(no_aux,$1); aux = new_node("MethodParams",NULL); add_sibiling(no_aux->child_node,new_node("Id",$2));add_sibiling($1,aux);add_child(aux,$4); $$ = no_aux;}}
+	| VOID ID OCURV CCURV                                               {if(syntax_flag != 1){no_aux = new_node("MethodHeader", NULL); add_child(no_aux,new_node("Void",NULL));add_sibiling(no_aux->child_node,new_node("Id",$2)); add_sibiling(no_aux->child_node,new_node("MethodParams",NULL));$$ = no_aux;}}
+	| VOID ID OCURV FormalParams CCURV                                  {if(syntax_flag != 1){no_aux = new_node("MethodHeader",NULL); add_child(no_aux,new_node("Void",NULL)); aux = new_node("MethodParams",NULL); add_sibiling(no_aux->child_node,new_node("Id",$2)); add_sibiling(no_aux->child_node,aux); add_child(aux,$4);$$ = no_aux;}}
 	;
 
 
-MethodBodyAux: VarDecl
-	| Statement
-	| MethodBodyAux VarDecl
-	| MethodBodyAux Statement
+MethodBody
+	: OBRACE MethodBodyAux CBRACE                                       {if(syntax_flag != 1){no_aux = new_node("MethodBody",NULL); add_child(no_aux,$2); $$ = no_aux;}}
 	;
 
 
-FormalParams: Type ID
-	| Type ID FormalParamsAux
-	| STRING OSQUARE CSQUARE ID
+MethodBodyAux
+	: MethodBodyAux VarDecl                                             {if(syntax_flag != 1){add_sibiling($1,$2); $$ = $1;}}
+  | MethodBodyAux Statement                                           {if(syntax_flag != 1){add_sibiling($1,$2); $$ = $1;}}
+  | %empty                                                            {if(syntax_flag != 1){$$ = new_node("NULL",NULL);}}
 	;
 
+
+FormalParams
+	: Type ID FormalParamsAux                                           {if(syntax_flag != 1){no_aux = new_node("ParamDecl",NULL);add_child(no_aux,$1);add_sibiling($1,new_node("Id",$2));add_sibiling(no_aux,$3); $$ = no_aux;}}
+	| STRING OSQUARE CSQUARE ID                                         {if(syntax_flag != 1){no_aux = new_node("ParamDecl",NULL);add_child(no_aux,new_node("StringArray",NULL)); add_sibiling(no_aux->child_node,new_node("Id",$4)); $$ = no_aux;}}
+  | Type ID                                                           {if(syntax_flag != 1){no_aux = new_node("ParamDecl",NULL);add_child(no_aux,$1); add_sibiling($1,new_node("Id",$2)); $$ = no_aux; }}
+  ;
 
 FormalParamsAux
-	: FormalParamsAux COMMA Type ID
-	| COMMA Type ID
+	: COMMA Type ID FormalParamsAux                                     {if(syntax_flag != 1){no_aux = new_node("ParamDecl",NULL); add_child(no_aux,$2); add_sibiling($2,new_node("Id",$3));add_sibiling(no_aux,$4); $$ = no_aux;}}
+	| COMMA Type ID                                                     {if(syntax_flag != 1){no_aux = new_node("ParamDecl",NULL); add_child(no_aux,$2); add_sibiling($2,new_node("Id",$3)); $$ = no_aux;}}
 	;
 
 
 VarDecl
-	: Type ID FieldDeclAux SEMI
-	| Type ID SEMI
+	: Type ID VarDeclAux SEMI                                          {if(syntax_flag != 1){no_aux = new_node("VarDecl",NULL); add_child(no_aux,$1);add_sibiling(no_aux->child_node,new_node("Id",$2)); add_sibiling(no_aux,$3);$$ = no_aux;}}
+  | Type ID SEMI                                                     {if(syntax_flag != 1){no_aux = new_node("VarDecl",NULL); add_child(no_aux,$1); add_sibiling($1,new_node("Id",$2)); $$ = no_aux;}}
+  ;
+VarDeclAux
+  : COMMA ID VarDeclAux                                              {if(syntax_flag != 1){no_aux = new_node("VarDecl",NULL); add_child(no_aux,new_node(string_type,NULL));add_sibiling(no_aux->child_node,new_node("Id",$2));add_sibiling(no_aux,$3);$$ = no_aux;}}
+  | COMMA ID                                                         {if(syntax_flag != 1){no_aux = new_node("VarDecl",NULL); add_child(no_aux,new_node(string_type,NULL)); add_sibiling(no_aux->child_node,new_node("Id",$2)); $$ = no_aux;}}
+  ;
+
+Type: BOOL                                                           {if(syntax_flag != 1){$$ = new_node("Bool",NULL);strcpy(string_type,"Bool");}}
+	| INT                                                              {if(syntax_flag != 1){$$ = new_node("Int",NULL);strcpy(string_type,"Int");}}
+	| DOUBLE                                                           {if(syntax_flag != 1){$$ = new_node("Double",NULL);strcpy(string_type,"Double");}}
 	;
 
-Type: BOOL
-	| INT
-	| DOUBLE
+Statement: OBRACE StatementAux CBRACE                                {if(syntax_flag != 1){
+                                                                      if ($2 != NULL){
+                                                                        if ($2->next_node != NULL){
+                                                                          no_aux = new_node("Block",NULL);
+                                                                          add_child(no_aux,$2);
+                                                                          $$ = no_aux;}
+                                                                          else{$$ = $2;}
+                                                                          }else{$$ = $2;}}}
+  | OBRACE CBRACE                                                     {if(syntax_flag != 1){$$ = NULL;}}
+	| IF OCURV Expr CCURV Statement %prec NO_ELSE                       {if(syntax_flag != 1){
+                                                                        no_aux = new_node("If",NULL);
+                                                                        add_child(no_aux,$3);
+                                                                        if ( $5 != NULL )
+                                                                        {
+                                                                          if ( $5->next_node != NULL )
+                                                                          {
+                                                                            aux = new_node("Block", NULL);
+                                                                            add_sibiling($3,aux);
+                                                                            add_child(aux,$5);
+
+                                                                            aux1 = new_node("Block",NULL);
+                                                                            add_child($$,aux1);
+
+                                                                          }
+                                                                          else
+                                                                          {
+                                                                            add_sibiling($3,$5);
+                                                                            aux1 = new_node("Block",NULL);
+                                                                            add_sibiling($5,aux1);
+                                                                          }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                          aux = new_node("Block",NULL);
+                                                                          add_sibiling($3,aux);
+                                                                          aux1 = new_node("Block",NULL);
+                                                                          add_sibiling($3,aux1);
+                                                                        }
+                                                                        $$ = no_aux;
+                                                                      }}
+	| IF OCURV Expr CCURV Statement ELSE Statement                      {if(syntax_flag != 1){
+                                                                        no_aux = new_node("If",NULL); add_child(no_aux,$3);
+                                                                        if ( $5 != NULL )
+                                                                        {
+                                                                          if ( $5->next_node != NULL )
+                                                                          {
+                                                                            aux = new_node("Block",NULL);
+                                                                            add_sibiling($3,aux);
+                                                                            add_child(aux,$5);
+                                                                          }
+                                                                          else
+                                                                          {
+                                                                            add_sibiling($3,$5);
+                                                                          }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                          aux = new_node("Block",NULL);
+                                                                          add_sibiling($3,aux);
+                                                                        }
+
+                                                                        if ( $7 != NULL )
+                                                                        {
+                                                                          if ( $7->next_node != NULL )
+                                                                          {
+                                                                            aux2 = new_node("Block",NULL);
+                                                                            add_sibiling($3,aux2);
+                                                                            add_child(aux2,$7);
+                                                                          }
+                                                                          else
+                                                                          {
+                                                                            add_sibiling($3,$7);
+                                                                          }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                          aux = new_node("Block",NULL);
+                                                                          add_sibiling($3,aux);
+                                                                        }
+
+                                                                        $$ = no_aux;
+                                                                      }
+                                                                    }
+	| WHILE OCURV Expr CCURV Statement                                  {if(syntax_flag != 1){
+                                                                        no_aux = new_node("While",NULL);add_child(no_aux,$3);
+                                                                        if ( $5 != NULL)
+                                                                        {
+                                                                          if ($5->next_node != NULL)
+                                                                          {
+                                                                            aux = new_node("Block",NULL);
+                                                                            add_child(aux,$5);
+                                                                            add_sibiling($3,aux);
+                                                                          }
+                                                                          else
+                                                                          {
+                                                                            add_sibiling($3,$5);
+                                                                          }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                          aux = new_node("Block",NULL);
+                                                                          add_sibiling($3,aux);
+                                                                        }
+                                                                        $$ = no_aux;
+                                                                      }
+                                                                    }
+	| DO Statement WHILE OCURV Expr CCURV SEMI                          {if(syntax_flag != 1){
+                                                                        no_aux = new_node("DoWhile",NULL);
+                                                                        if ($2 != NULL )
+                                                                        {
+                                                                          if ( $2->next_node != NULL )
+                                                                          {
+                                                                            aux = new_node("Block",NULL);
+                                                                            add_child(aux,$2);
+                                                                            add_sibiling($5,aux);
+                                                                            add_child(no_aux,aux);
+                                                                          }
+                                                                          else
+                                                                          {
+                                                                            add_sibiling($2,$5);
+                                                                            add_child(no_aux,$2);
+                                                                          }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                          aux = new_node("Block",NULL);
+                                                                          add_sibiling(aux,$5);
+                                                                          add_child(no_aux,aux);
+                                                                        }
+                                                                        $$ = no_aux;
+                                                                      }
+                                                                    }
+	| PRINT OCURV Expr CCURV SEMI                                       {if(syntax_flag != 1){no_aux = new_node("Print",NULL); add_child(no_aux,$3); $$ = no_aux; }}
+	| PRINT OCURV STRLIT CCURV SEMI                                     {if(syntax_flag != 1){no_aux = new_node("Print",NULL); add_child(no_aux, new_node("StrLit",$3)); $$ = no_aux;}}
+	| SEMI                                                              {if(syntax_flag != 1){$$ = NULL;}}
+	| Assignment SEMI                                                   {if(syntax_flag != 1){$$ = $1;}}
+	| ParseArgs SEMI                                                    {if(syntax_flag != 1){$$ = $1;}}
+  | MethodInvocation SEMI                                             {if(syntax_flag != 1){$$ = $1;}}
+	| RETURN  SEMI                                                      {if(syntax_flag != 1){$$ = new_node("Return",NULL);}}
+	| RETURN  Expr SEMI                                                 {if(syntax_flag != 1){$$ = new_node("Return",NULL); add_child($$,$2);}}
+	| error SEMI                                                        {$$ = NULL;}
 	;
 
-Statement: OBRACE StatementAux CBRACE
-  | OBRACE CBRACE
-	| IF OCURV Expr CCURV Statement %prec NO_ELSE
-	| IF OCURV Expr CCURV Statement ELSE Statement
-	| WHILE OCURV Expr CCURV Statement
-	| DO Statement WHILE OCURV Expr CCURV SEMI
-	| PRINT OCURV Expr CCURV SEMI
-	| PRINT OCURV STRLIT CCURV SEMI
-	| SEMI
-	| Assignment SEMI
-  | Assignment ParseArgs SEMI
-  | Assignment MethodInvocation SEMI
-  | Assignment MethodInvocation ParseArgs SEMI
-	| MethodInvocation SEMI
-  | MethodInvocation ParseArgs SEMI
-	| ParseArgs SEMI
-	| RETURN  SEMI
-	| RETURN  Expr SEMI
-	| error SEMI
+StatementAux
+	: StatementAux Statement                                            {if(syntax_flag != 1){if ( $1 != NULL){
+                                                                            $$ = $1;
+                                                                            add_sibiling($$,$2);
+                                                                      }else{
+                                                                          $$ = $2;
+                                                                      }}
+                                                                      }
+  | Statement                                                         {if(syntax_flag != 1){$$ = $1;}}
+  ;
+
+Assignment: ID ASSIGN Expr                                            {if(syntax_flag != 1){no_aux = new_node("Assign",NULL); add_child(no_aux,new_node("Id",$1)); add_sibiling(no_aux->child_node,$3); $$ = no_aux;}}
+  ;
+
+MethodInvocation: ID OCURV CCURV                                      {if(syntax_flag != 1){no_aux = new_node("Call",NULL); add_child(no_aux,new_node("Id",$1)); $$ = no_aux;}}
+	| ID OCURV Expr MethodInvocationAux CCURV                           {if(syntax_flag != 1){no_aux = new_node("Call",NULL); add_child(no_aux,new_node("Id",$1)); add_sibiling(no_aux->child_node,$3); add_sibiling(no_aux->child_node,$4); $$ = no_aux;}}
+	| ID OCURV error CCURV                                              { $$ = NULL;}
 	;
 
-StatementAux: Statement
-	| StatementAux Statement
-	;
-
-Assignment: ID ASSIGN Expr ;
-
-MethodInvocation: ID OCURV CCURV
-  | ID OCURV Expr CCURV
-	| ID OCURV Expr MethodInvocationAux CCURV
-	| ID OCURV error CCURV
-	;
-
-MethodInvocationAux : COMMA Expr
-	| MethodInvocationAux COMMA Expr
+MethodInvocationAux
+	: MethodInvocationAux COMMA Expr                                    {if(syntax_flag != 1){add_sibiling($1,$3);$$ = $1;}}
+  | %empty                                                            {if(syntax_flag != 1){$$ = new_node("NULL",NULL);}}
 	;
 
 
-ParseArgs: PARSEINT OCURV ID OSQUARE Expr CSQUARE CCURV
-	| PARSEINT OCURV error CCURV
+ParseArgs: PARSEINT OCURV ID OSQUARE Expr CSQUARE CCURV                    {if(syntax_flag != 1){no_aux = new_node("ParseArgs",NULL); add_child(no_aux,new_node("Id",$3)); add_sibiling(no_aux->child_node,$5); $$ = no_aux;}}
+	| PARSEINT OCURV error CCURV                                             {if(syntax_flag != 1){$$ = NULL;}}
 	;
 
 
-Expr: Assignment
-	| MethodInvocation
-	| ParseArgs
-	| Expr AND ExprAux
-	| Expr OR ExprAux
-	| Expr EQ ExprAux
-	| Expr GT ExprAux
-  | Expr GEQ ExprAux
-	| Expr LEQ ExprAux
-	| Expr LT ExprAux
-	| Expr NEQ ExprAux
-	| Expr PLUS ExprAux
-	| Expr MINUS ExprAux
-	| Expr STAR ExprAux
-	| Expr DIV ExprAux
-	| Expr MOD ExprAux
-	| PLUS ExprAux
-	| MINUS ExprAux
-	| NOT ExprAux
-	| ID
-	| ID DOTLENGTH
-	| OCURV Expr CCURV
-	| BOOLLIT
-	| DECLIT
-	| REALLIT
-	| OCURV error CCURV
+Expr: Assignment                                                           {if(syntax_flag != 1){$$ = $1;}}
+	| ExprAux                                                                {if(syntax_flag != 1){$$ = $1;}}
 	;
 
   ExprAux
-  	: MethodInvocation
-  	| ParseArgs
-  	| ExprAux AND ExprAux
-  	| ExprAux OR ExprAux
-  	| ExprAux EQ ExprAux
-  	| ExprAux GEQ ExprAux
-  	| ExprAux GT ExprAux
-  	| ExprAux LEQ ExprAux
-  	| ExprAux LT ExprAux
-  	| ExprAux NEQ ExprAux
-  	| ExprAux PLUS ExprAux
-  	| ExprAux STAR ExprAux
-    | ExprAux MINUS ExprAux
-  	| ExprAux DIV ExprAux
-  	| ExprAux MOD ExprAux
-    | PLUS ExprAux
-  	| MINUS ExprAux
-  	| NOT ExprAux
-  	| ID
-  	| ID DOTLENGTH
-  	| OCURV ExprAux CCURV
-  	| BOOLLIT
-  	| DECLIT
-  	| REALLIT
-  	| OCURV error CCURV
+  : MethodInvocation                                                       {if(syntax_flag != 1){$$ = $1;}}
+  	| ParseArgs                                                            {if(syntax_flag != 1){$$ = $1;}}
+  	| ExprAux AND ExprAux                                                  {if(syntax_flag != 1){no_aux = new_node("And",NULL); add_child(no_aux,$1); add_sibiling($1,$3); $$ = no_aux;}}
+  	| ExprAux OR ExprAux                                                   {if(syntax_flag != 1){no_aux = new_node("Or",NULL); add_child(no_aux,$1); add_sibiling($1,$3); $$ = no_aux;}}
+  	| ExprAux EQ ExprAux                                                   {if(syntax_flag != 1){no_aux = new_node("Eq",NULL); add_child(no_aux,$1); add_sibiling($1,$3); $$ = no_aux;}}
+    | ExprAux GEQ ExprAux                                                  {if(syntax_flag != 1){no_aux = new_node("Geq",NULL); add_child(no_aux,$1); add_sibiling($1,$3); $$ = no_aux;}}
+    | ExprAux GT ExprAux                                                   {if(syntax_flag != 1){no_aux = new_node("Gt",NULL); add_child(no_aux,$1); add_sibiling($1,$3); $$ = no_aux;}}
+  	| ExprAux LEQ ExprAux                                                  {if(syntax_flag != 1){no_aux = new_node("Leq",NULL); add_child(no_aux,$1); add_sibiling($1,$3); $$ = no_aux;}}
+  	| ExprAux LT ExprAux                                                   {if(syntax_flag != 1){no_aux = new_node("Lt",NULL); add_child(no_aux,$1); add_sibiling($1,$3); $$ = no_aux;}}
+  	| ExprAux NEQ ExprAux                                                  {if(syntax_flag != 1){no_aux = new_node("Neq",NULL); add_child(no_aux,$1); add_sibiling($1,$3); $$ = no_aux;}}
+  	| ExprAux PLUS ExprAux                                                 {if(syntax_flag != 1){no_aux = new_node("Add",NULL); add_child(no_aux,$1); add_sibiling($1,$3); $$ = no_aux;}}
+    | ExprAux STAR ExprAux                                                 {if(syntax_flag != 1){no_aux = new_node("Mul",NULL); add_child(no_aux,$1); add_sibiling($1,$3); $$ = no_aux;}}
+    | ExprAux MINUS ExprAux                                                {if(syntax_flag != 1){no_aux = new_node("Sub",NULL); add_child(no_aux,$1); add_sibiling($1,$3); $$ = no_aux;}}
+  	| ExprAux DIV ExprAux                                                  {if(syntax_flag != 1){no_aux = new_node("Div",NULL); add_child(no_aux,$1); add_sibiling($1,$3); $$ = no_aux;}}
+  	| ExprAux MOD ExprAux                                                  {if(syntax_flag != 1){no_aux = new_node("Mod",NULL); add_child(no_aux,$1); add_sibiling($1,$3); $$ = no_aux;}}
+    | PLUS ExprAux    %prec PRECEDENCE                                     {if(syntax_flag != 1){no_aux = new_node("Plus",NULL); add_child(no_aux,$2); $$ = no_aux;}}
+  	| MINUS ExprAux   %prec PRECEDENCE                                     {if(syntax_flag != 1){no_aux = new_node("Minus",NULL); add_child(no_aux,$2); $$ = no_aux;}}
+  	| NOT ExprAux     %prec PRECEDENCE                                     {if(syntax_flag != 1){no_aux = new_node("Not",NULL); add_child(no_aux,$2); $$ = no_aux;}}
+  	| ID                                                                   {if(syntax_flag != 1){no_aux = new_node("Id",$1); $$ = no_aux;}}
+  	| ID DOTLENGTH                                                         {if(syntax_flag != 1){no_aux = new_node("Length",NULL); add_child(no_aux,new_node("Id",$1)); $$ = no_aux;}}
+  	| OCURV Expr CCURV                                                     {if(syntax_flag != 1){$$ = $2;}}
+  	| BOOLLIT                                                              {if(syntax_flag != 1){no_aux = new_node("BoolLit",$1); $$ = no_aux;}}
+  	| DECLIT                                                               {if(syntax_flag != 1){no_aux = new_node("DecLit",$1); $$ = no_aux;}}
+  	| REALLIT                                                              {if(syntax_flag != 1){no_aux = new_node("RealLit",$1); $$ = no_aux;}}
+  	| OCURV error CCURV                                                    {if(syntax_flag != 1){$$ = NULL;}}
   	;
 
 
@@ -273,6 +423,15 @@ int main(int argc, char *argv[]) {
 			flag=0;
 			yylex();
 		}
+    if ( strncmp(argv[1],"-t",2) == 0)
+    {
+      parse = -1;
+      yyparse();
+      print_tree(root,0);
+    }
+
+
+
 	}
 	if (argc == 1 )
 	{
@@ -286,6 +445,8 @@ void yyerror(char* s)
 {
 	if ( parse == -1)
   {
+    syntax_flag = 1;
 		printf("Line %d, col %d: %s: %s\n", n_lines, (int)(n_column - strlen(yytext)), s, yytext);
+    return;
   }
 }

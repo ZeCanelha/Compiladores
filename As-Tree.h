@@ -1,17 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-typedef struct node node;
-
-typedef struct node
+typedef struct node_type
 {
-  int value;
+  char * type;
   char * token;
-  node * next_node;
-  node * child_node;
-}
+  struct node_type * next_node;
+  struct node_type * child_node;
+}node_type;
 
-node * new_node(char *, int );
-void * add_sibiling( node *, char * , int);
-void * add_child( node * , char * , int );
+
+/* TO DO: Enum para nao comparar as strings */
+
+node_type * new_node(char *, char *);
+void add_child( node_type *  , node_type *);
+void add_sibiling ( node_type * , node_type * );
+void print_tree ( node_type * , int );

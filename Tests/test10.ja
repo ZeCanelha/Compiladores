@@ -1,0 +1,8 @@
+class UnaryDemo {
+    public static void main(String[] args) {
+    	int a,b,c;
+     	b = a || c;
+     	func();
+     	func2(a,b);
+    }
+}

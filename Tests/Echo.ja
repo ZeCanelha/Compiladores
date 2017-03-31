@@ -1,0 +1,13 @@
+class Echo {
+	public static void main(String[] args) {
+		int x;
+		//este comentario é para ignorar*/
+		x = Integer.parseInt(args[0]);
+		System.out.println(x);
+
+		/*
+		este tambem
+		lol
+		*/
+	} 
+}

@@ -1,0 +1,12 @@
+class asd
+{
+  public static int a,b;
+  public static void main(){
+    if(a){while(1)
+    {
+      return a;
+    }}
+  }
+
+
+}

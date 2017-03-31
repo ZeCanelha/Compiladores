@@ -1,0 +1,6 @@
+class teste{
+  public static void a(){}                            /* Func , so falta saber sacar o valor do type eheh */
+  public static int b(){}                             /* Tá */
+  public static int c(int d , int e){}                /* Falta completar*/
+  public static void f ( int g , int h){}             /* Tá */
+}

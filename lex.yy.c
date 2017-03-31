@@ -722,6 +722,7 @@ char *yytext;
 #line 2 "jac.l"
 
 #include "y.tab.h"
+#include "As-Tree.h"
 #include <string.h>
   	extern int n_lines;
 		extern int n_column;
@@ -729,7 +730,6 @@ char *yytext;
 		int st_column = 0;
 		extern int flag;
     extern int parse;
-
 #define RETURN_TOKEN(x) {yylval.token = strdup(yytext);return x;}
 
 
