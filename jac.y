@@ -127,14 +127,17 @@
 %%
 
 Program: CLASS ID OBRACE  ProgramAux  CBRACE                          {if(syntax_flag != 1){no_aux = new_node("Id",$2);root = new_node("Program",NULL);add_sibiling(no_aux,$4);add_child(root,no_aux);}}
-	;
+  | CLASS ID OBRACE  CBRACE                                           {if(syntax_flag != 1){no_aux = new_node("Id",$2);root = new_node("Program",NULL);add_child(root,no_aux);}}
+  ;
 
 ProgramAux
 	: ProgramAux FieldDecl                                              {if(syntax_flag != 1){add_sibiling($1,$2); $$ = $1;}}
 	| ProgramAux MethodDecl                                             {if(syntax_flag != 1){add_sibiling($1,$2); $$ = $1;}}
 	| ProgramAux SEMI                                                   {if(syntax_flag != 1){$$ = $1;}}
-  | %empty                                                            {if(syntax_flag != 1){$$ = new_node("NULL",NULL);}}
-
+  | FieldDecl                                                         {if ( syntax_flag != 1){$$ = $1;}}
+  | MethodDecl                                                        {if ( syntax_flag != 1){$$ = $1;}};
+  | SEMI                                                              {if ( syntax_flag != 1){$$ = NULL;}}
+  ;
 
 
   FieldDecl
@@ -328,7 +331,7 @@ Statement: OBRACE StatementAux CBRACE                                {if(syntax_
                                                                       }
                                                                     }
 	| PRINT OCURV Expr CCURV SEMI                                       {if(syntax_flag != 1){no_aux = new_node("Print",NULL); add_child(no_aux,$3); $$ = no_aux; }}
-	| PRINT OCURV STRLIT CCURV SEMI                                     {if(syntax_flag != 1){no_aux = new_node("Print",NULL); add_child(no_aux, new_node("StrLit",NULL)); $$ = no_aux;}}
+	| PRINT OCURV STRLIT CCURV SEMI                                     {if(syntax_flag != 1){no_aux = new_node("Print",NULL); add_child(no_aux, new_node("StrLit",$3)); $$ = no_aux;}}
 	| SEMI                                                              {if(syntax_flag != 1){$$ = NULL;}}
 	| Assignment SEMI                                                   {if(syntax_flag != 1){$$ = $1;}}
 	| ParseArgs SEMI                                                    {if(syntax_flag != 1){$$ = $1;}}
@@ -393,11 +396,11 @@ Expr: Assignment                                                           {if(s
   	| NOT ExprAux     %prec PRECEDENCE                                     {if(syntax_flag != 1){no_aux = new_node("Not",NULL); add_child(no_aux,$2); $$ = no_aux;}}
   	| ID                                                                   {if(syntax_flag != 1){no_aux = new_node("Id",$1); $$ = no_aux;}}
   	| ID DOTLENGTH                                                         {if(syntax_flag != 1){no_aux = new_node("Length",NULL); add_child(no_aux,new_node("Id",$1)); $$ = no_aux;}}
-  	| OCURV Expr CCURV                                                  {if(syntax_flag != 1){$$ = $2;}}
+  	| OCURV Expr CCURV                                                     {if(syntax_flag != 1){$$ = $2;}}
   	| BOOLLIT                                                              {if(syntax_flag != 1){no_aux = new_node("BoolLit",$1); $$ = no_aux;}}
   	| DECLIT                                                               {if(syntax_flag != 1){no_aux = new_node("DecLit",$1); $$ = no_aux;}}
   	| REALLIT                                                              {if(syntax_flag != 1){no_aux = new_node("RealLit",$1); $$ = no_aux;}}
-  	| OCURV error CCURV                                                    {$$ = NULL;}
+  	| OCURV error CCURV                                                    {if(syntax_flag != 1){$$ = NULL;}}
   	;
 
 
@@ -444,5 +447,6 @@ void yyerror(char* s)
   {
     syntax_flag = 1;
 		printf("Line %d, col %d: %s: %s\n", n_lines, (int)(n_column - strlen(yytext)), s, yytext);
+    return;
   }
 }

@@ -1,0 +1,3 @@
+class x {
+	public static void x (String[] args);
+}
