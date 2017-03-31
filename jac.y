@@ -19,6 +19,8 @@
   struct node_type * root = NULL;
   struct node_type * no_aux = NULL;
   struct node_type * aux = NULL;
+  struct node_type * aux1 = NULL;
+  struct node_type * aux2 = NULL;
   char string_type[15];
 
 %}
@@ -30,7 +32,8 @@
 }
 
 
-%token  BOOL
+
+%token <token> BOOL
 %token <token> BOOLLIT
 %token  CLASS
 %token  DO
@@ -57,6 +60,8 @@
 %token  OR
 %token  LT
 %token  GT
+%token  EQ
+%token  NEQ
 %token  LEQ
 %token  GEQ
 %token  PLUS
@@ -75,8 +80,6 @@
 %token <token> STRLIT
 
 
-%nonassoc NO_ELSE
-%nonassoc ELSE
 
 
 %type <no> Program
@@ -117,6 +120,9 @@
 %right NOT
 %right PRECEDENCE
 %left OBRACE OCURV OSQUARE CCURV CSQUARE CBRACE
+
+%nonassoc NO_ELSE
+%nonassoc ELSE
 
 %%
 
@@ -189,8 +195,15 @@ Type: BOOL                                                           {if(syntax_
 	| DOUBLE                                                           {if(syntax_flag != 1){$$ = new_node("Double",NULL);strcpy(string_type,"Double");}}
 	;
 
-Statement: OBRACE StatementAux CBRACE                                {if(syntax_flag != 1){if ($2 != NULL){if ($2->next_node != NULL){ no_aux = new_node("Block",NULL); add_child(no_aux,$2); $$ = no_aux;}else{$$ = $2;}}else{$$ = $2;}}}
-  | OBRACE CBRACE                                                     {$$ = NULL;}
+Statement: OBRACE StatementAux CBRACE                                {if(syntax_flag != 1){
+                                                                      if ($2 != NULL){
+                                                                        if ($2->next_node != NULL){
+                                                                          no_aux = new_node("Block",NULL);
+                                                                          add_child(no_aux,$2);
+                                                                          $$ = no_aux;}
+                                                                          else{$$ = $2;}
+                                                                          }else{$$ = $2;}}}
+  | OBRACE CBRACE                                                     {if(syntax_flag != 1){$$ = NULL;}}
 	| IF OCURV Expr CCURV Statement %prec NO_ELSE                       {if(syntax_flag != 1){
                                                                         no_aux = new_node("If",NULL);
                                                                         add_child(no_aux,$3);
@@ -201,16 +214,24 @@ Statement: OBRACE StatementAux CBRACE                                {if(syntax_
                                                                             aux = new_node("Block", NULL);
                                                                             add_sibiling($3,aux);
                                                                             add_child(aux,$5);
+
+                                                                            aux1 = new_node("Block",NULL);
+                                                                            add_child($$,aux1);
+
                                                                           }
                                                                           else
                                                                           {
                                                                             add_sibiling($3,$5);
+                                                                            aux1 = new_node("Block",NULL);
+                                                                            add_sibiling($5,aux1);
                                                                           }
                                                                         }
                                                                         else
                                                                         {
                                                                           aux = new_node("Block",NULL);
                                                                           add_sibiling($3,aux);
+                                                                          aux1 = new_node("Block",NULL);
+                                                                          add_sibiling($3,aux1);
                                                                         }
                                                                         $$ = no_aux;
                                                                       }}
@@ -239,9 +260,9 @@ Statement: OBRACE StatementAux CBRACE                                {if(syntax_
                                                                         {
                                                                           if ( $7->next_node != NULL )
                                                                           {
-                                                                            aux = new_node("Block",NULL);
-                                                                            add_sibiling($3,aux);
-                                                                            add_child(aux,$7);
+                                                                            aux2 = new_node("Block",NULL);
+                                                                            add_sibiling($3,aux2);
+                                                                            add_child(aux2,$7);
                                                                           }
                                                                           else
                                                                           {
@@ -261,7 +282,6 @@ Statement: OBRACE StatementAux CBRACE                                {if(syntax_
                                                                         no_aux = new_node("While",NULL);add_child(no_aux,$3);
                                                                         if ( $5 != NULL)
                                                                         {
-
                                                                           if ($5->next_node != NULL)
                                                                           {
                                                                             aux = new_node("Block",NULL);
@@ -344,7 +364,7 @@ MethodInvocationAux
 
 
 ParseArgs: PARSEINT OCURV ID OSQUARE Expr CSQUARE CCURV                    {if(syntax_flag != 1){no_aux = new_node("ParseArgs",NULL); add_child(no_aux,new_node("Id",$3)); add_sibiling(no_aux->child_node,$5); $$ = no_aux;}}
-	| PARSEINT OCURV error CCURV                                             {$$ = NULL;}
+	| PARSEINT OCURV error CCURV                                             {if(syntax_flag != 1){$$ = NULL;}}
 	;
 
 
@@ -368,12 +388,12 @@ Expr: Assignment                                                           {if(s
     | ExprAux MINUS ExprAux                                                {if(syntax_flag != 1){no_aux = new_node("Sub",NULL); add_child(no_aux,$1); add_sibiling($1,$3); $$ = no_aux;}}
   	| ExprAux DIV ExprAux                                                  {if(syntax_flag != 1){no_aux = new_node("Div",NULL); add_child(no_aux,$1); add_sibiling($1,$3); $$ = no_aux;}}
   	| ExprAux MOD ExprAux                                                  {if(syntax_flag != 1){no_aux = new_node("Mod",NULL); add_child(no_aux,$1); add_sibiling($1,$3); $$ = no_aux;}}
-    | PLUS ExprAux                                                         {if(syntax_flag != 1){no_aux = new_node("Plus",NULL); add_child(no_aux,$2); $$ = no_aux;}}
-  	| MINUS ExprAux                                                        {if(syntax_flag != 1){no_aux = new_node("Minus",NULL); add_child(no_aux,$2); $$ = no_aux;}}
-  	| NOT ExprAux                                                          {if(syntax_flag != 1){no_aux = new_node("Not",NULL); add_child(no_aux,$2); $$ = no_aux;}}
+    | PLUS ExprAux    %prec PRECEDENCE                                     {if(syntax_flag != 1){no_aux = new_node("Plus",NULL); add_child(no_aux,$2); $$ = no_aux;}}
+  	| MINUS ExprAux   %prec PRECEDENCE                                     {if(syntax_flag != 1){no_aux = new_node("Minus",NULL); add_child(no_aux,$2); $$ = no_aux;}}
+  	| NOT ExprAux     %prec PRECEDENCE                                     {if(syntax_flag != 1){no_aux = new_node("Not",NULL); add_child(no_aux,$2); $$ = no_aux;}}
   	| ID                                                                   {if(syntax_flag != 1){no_aux = new_node("Id",$1); $$ = no_aux;}}
   	| ID DOTLENGTH                                                         {if(syntax_flag != 1){no_aux = new_node("Length",NULL); add_child(no_aux,new_node("Id",$1)); $$ = no_aux;}}
-  	| OCURV ExprAux CCURV                                                  {if(syntax_flag != 1){$$ = $2;}}
+  	| OCURV Expr CCURV                                                  {if(syntax_flag != 1){$$ = $2;}}
   	| BOOLLIT                                                              {if(syntax_flag != 1){no_aux = new_node("BoolLit",$1); $$ = no_aux;}}
   	| DECLIT                                                               {if(syntax_flag != 1){no_aux = new_node("DecLit",$1); $$ = no_aux;}}
   	| REALLIT                                                              {if(syntax_flag != 1){no_aux = new_node("RealLit",$1); $$ = no_aux;}}

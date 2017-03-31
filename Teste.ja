@@ -1,10 +1,9 @@
-class id{
-  public static int b()
+class asd
+{
+  public static int main ()
   {
-    if ( a = 1 )
-    {
-      return a;
-      return b;
-    }
+      a(b);
+      a(d,b);
+  }
   }
 }
