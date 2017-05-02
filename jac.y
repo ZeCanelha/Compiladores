@@ -4,6 +4,7 @@
   #include <stdlib.h>
   #include <string.h>
   #include "As-Tree.h"
+  #include "semantics.h"
 
 
   int yylex(void);
@@ -131,7 +132,7 @@ Program: CLASS ID OBRACE  ProgramAux  CBRACE                          {if(syntax
   ;
 
 ProgramAux
-	: ProgramAux FieldDecl                                              {if(syntax_flag != 1){add_sibiling($1,$2); $$ = $1;}}
+    : ProgramAux FieldDecl                                              {if(syntax_flag != 1){add_sibiling($1,$2); $$ = $1;}}
 	| ProgramAux MethodDecl                                             {if(syntax_flag != 1){add_sibiling($1,$2); $$ = $1;}}
 	| ProgramAux SEMI                                                   {if(syntax_flag != 1){$$ = $1;}}
   | FieldDecl                                                         {if ( syntax_flag != 1){$$ = $1;}}
@@ -423,20 +424,33 @@ int main(int argc, char *argv[]) {
 			flag=0;
 			yylex();
 		}
-    if ( strncmp(argv[1],"-t",2) == 0)
-    {
-      parse = -1;
-      yyparse();
-      print_tree(root,0);
-    }
+        if ( strncmp(argv[1],"-t",2) == 0 )
+        {
+          parse = -1;
+          yyparse();
+          print_tree(root,0);
+        }
+        if ( strncmp(argv[1],"-2",2) == 0)
+        {
+            parse = -1;
+            yyparse();
+        }
+        else
+        {
+            parse = -1;
+            yyparse();
+            if ( sintax_flag != 1 )
+            {
+                
+            }
 
-
-
+        }
 	}
+
 	if (argc == 1 )
 	{
 		parse = -1;
-    yyparse();
+        yyparse();
 	}
 
 	return 0;
@@ -444,8 +458,8 @@ int main(int argc, char *argv[]) {
 void yyerror(char* s)
 {
 	if ( parse == -1)
-  {
-    syntax_flag = 1;
+    {
+        syntax_flag = 1;
 		printf("Line %d, col %d: %s: %s\n", n_lines, (int)(n_column - strlen(yytext)), s, yytext);
     return;
   }
