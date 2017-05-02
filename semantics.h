@@ -2,6 +2,16 @@
 #define SEMANTICS_H
 
 
+// Params
+
+typedef struct params
+{
+    char * type;
+    char * id;
+    struct params * next;
+}param_h;
+
+
 // Simbols
 
 typedef struct sym_table
@@ -12,18 +22,10 @@ typedef struct sym_table
 
     param_h * params;
 
-    struct sym_table * next
+    struct sym_table * next;
 
 }sym_table_node;
 
-// Params
-
-typedef struct params
-{
-    char * type;
-    char * id;
-    struct params * next;
-}param_h;
 
 // table_header
 
@@ -43,7 +45,7 @@ sym_table_node * create_symbol(char * , param_h * , char * , char *);
 table_header * create_table(char * , param_h *);
 void add_table( table_header * , char * );
 void print_table ( table_header * root );
-void ast_to_sym_table( node_type * root );
+void ast_to_sym_table( node_type * root , table_header * );
 void add_sym_to_table(table_header * ,char * , char * , param_h * , char *, int);
 
 #endif

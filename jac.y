@@ -410,7 +410,7 @@ Expr: Assignment                                                           {if(s
 
 int main(int argc, char *argv[]) {
 
-
+    printf("SADASD");
 	if (argc >= 2)
 	{
 		if(strncmp(argv[1],"-l",2)==0)
@@ -435,22 +435,24 @@ int main(int argc, char *argv[]) {
             parse = -1;
             yyparse();
         }
-        else
-        {
-            parse = -1;
-            yyparse();
-            if ( sintax_flag != 1 )
-            {
-                
-            }
-
-        }
 	}
 
 	if (argc == 1 )
 	{
-		parse = -1;
+        parse = -1;
         yyparse();
+        if ( syntax_flag != 1 )
+        {
+
+            char * temp_name = ( char * ) malloc ( 100 * sizeof(char));
+            strcpy(temp_name,"===== Class ");
+            strcat(temp_name,root->token);
+            strcat(temp_name," Symbol Table =====");
+
+            root_pointer = create_table(temp_name,NULL);
+            ast_to_sym_table(root,root_pointer);
+            print_table(root_pointer);
+        }
 	}
 
 	return 0;

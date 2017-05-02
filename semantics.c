@@ -32,7 +32,6 @@ table_header * create_table ( char * name , param_h * paramtype )
 
     strcpy(new_table->head,name);
     new_table->l_params = paramtype;
-
     new_table->lista_sym = NULL;
     new_table->next = NULL;
 
@@ -47,42 +46,38 @@ void add_table ( table_header * root, char * name )
     {
         aux_table = aux_table->next;
     }
+    //TODO: PARAMS
+    char * temp_name = ( char * ) malloc ( 100 * sizeof(char));
+    strcpy(temp_name,"===== Method ");
+    strcat(temp_name,name);
+    strcat(temp_name," Symbol Table =====");
 
-    aux_table->next = create_table(temp_name);
+    aux_table->next = create_table(temp_name,NULL);
     aux_table = aux_table->next;
 }
 
-void ast_to_sym_table( node_type * root )
+void ast_to_sym_table( node_type * root , table_header * table_root)
 {
     node_type * root_aux;
-    root_aux = root;
+    root_aux = root->child_node;
     node_type * child_aux;
 
-    if ( strcmp(root_aux->type,"Program") == 0 )
-    {
-        char * temp_name = ( char * ) malloc ( 100 * sizeof(char));
-        strcpy(temp_name,"===== Class ");
-        strcat(temp_name,root_aux->token);
-        strcat(temp_name," Symbol Table =====");
-        create_table(temp_name, NULL);
-        root_aux = root_aux->child_node;
-    }
+
     while (root_aux)
     {
         if ( strcmp(root_aux->type, "NULL")!= 0)
         {
-            //TODO: Arranjar o metodo de adicionar tabelas eo while
             if ( strcmp(root_aux->type,"FieldDecl") == 0 )
             {
                 child_aux = root_aux->child_node;
                 do{
                     if (!strcmp(child_aux->type,"NULL"))
                     {
-                        add_sym_to_table(root,id,type,NULL,"",1);
+                        add_sym_to_table(table_root,child_aux->token,child_aux->type,NULL,"",1);
                     }
                     child_aux = child_aux->next_node;
                 }
-                while(child_aux != NULL)
+                while(child_aux != NULL);
 
 
             }
@@ -98,7 +93,7 @@ void ast_to_sym_table( node_type * root )
 }
 
 
-void add_sym_to_table( table_header * root, char * id , char * type, param_h * paramtype , int n_table )
+void add_sym_to_table( table_header * root, char * id , char * type, param_h * paramtype , char * flag, int n_table )
 {
     table_header * root_aux = root;
     if ( n_table == 1 )
@@ -148,14 +143,10 @@ void print_table( table_header * root)
     }
 
     printf("\t%s",root_aux->lista_sym->type);
-    if ( strcmp(flag,"") != 0 )
+    if ( strcmp(root_aux->lista_sym->flag,"") != 0 )
     {
         printf("\t%s",root_aux->lista_sym->flag);
     }
     printf("\n");
-
-
-
-
 
 }
