@@ -46,8 +46,10 @@ table_header * create_table(char * , param_h *);
 void add_table( table_header * , char *, param_h * );
 void print_table ( table_header * root );
 void ast_to_sym_table( node_type * root , table_header * );
-void add_sym_to_table(table_header * ,char * , char * , param_h * , char *, int);
+void add_sym_to_table(table_header * ,char * , char * , param_h * , char *, int,int);
 param_h * get_params( node_type * node );
 param_h * create_param(char * , char * );
+char * toLowerCase(char * );
+int check_double_var(table_header * , char *);
 
 #endif

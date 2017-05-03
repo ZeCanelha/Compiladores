@@ -447,7 +447,6 @@ int main(int argc, char *argv[]) {
                 root_pointer = create_table(temp_name,NULL);
                 ast_to_sym_table(root,root_pointer);
                 print_table(root_pointer);
-                printf("\n");
                 print_tree(root,0);
             }
         }

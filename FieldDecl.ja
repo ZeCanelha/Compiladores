@@ -1,8 +1,14 @@
-class main{
-  public static int b()
-  {
-    int a,b,c,d;
-  }
-  public static boolean d(){}
-  public static void a(){}
+class gcd
+{
+    public static int a;
+    public static int b(){}
+    public static boolean c;
+    public static double d,e,f;
+    public static double asd( int x , boolean d){}
+    public static void main(String[] arg)
+    {
+        int a,b;
+    }
+
+
 }
