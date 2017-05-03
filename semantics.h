@@ -43,9 +43,11 @@ table_header * root_pointer;
 
 sym_table_node * create_symbol(char * , param_h * , char * , char *);
 table_header * create_table(char * , param_h *);
-void add_table( table_header * , char * );
+void add_table( table_header * , char *, param_h * );
 void print_table ( table_header * root );
 void ast_to_sym_table( node_type * root , table_header * );
 void add_sym_to_table(table_header * ,char * , char * , param_h * , char *, int);
+param_h * get_params( node_type * node );
+param_h * create_param(char * , char * );
 
 #endif

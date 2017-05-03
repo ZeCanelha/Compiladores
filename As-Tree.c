@@ -45,7 +45,7 @@ void print_tree (node_type * no, int n_points) {
   }
 	else{
 
-    if ( !strcmp(no->type,"NULL") != 0);
+    if ( strcmp(no->type,"NULL") == 0);
     else{
       for(i=0; i< n_points; i++)
         printf(".");
