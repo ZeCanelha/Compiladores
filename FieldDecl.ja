@@ -1,12 +1,62 @@
-class gcd
+class A
 {
-    public static int a;
-    public static double abc(int d, boolean d){}
-    public static boolean c;
-    public static void main(String[] args)
-    {
-        int a,b;
-    }
 
+    public static boolean meth1(int a, int b, int c, int d)
+    {}
+
+    public static int a;
+
+    public static void meth2(int a)
+    {}
+
+    public static int b;
+
+    public static void meth3(int a)
+    {}
+
+    public static int b;
+
+    public static void meth4(int a)
+    {}
+
+    public static int d;
+
+    public static boolean meth5(int a)
+    {}
+
+    public static int e;
+
+    public static double meth6(int a)
+    {}
+
+    public static double meth7(int a)
+    {}
+
+    public static int meth8()
+    {}
+
+    public static void meth9()
+    {}
+
+    public static int meth10()
+    {}
+
+    public static void meth11(int a)
+    {}
+
+    public static void meth12(int a)
+    {}
+
+    public static void meth13(int a)
+    {}
+
+    public static void meth14()
+    {}
+
+    public static void meth15(int a)
+    {}
+
+    public static double meth16(int a)
+    {}
 
 }

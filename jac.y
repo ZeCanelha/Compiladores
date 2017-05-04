@@ -15,7 +15,6 @@
   int flag = 0 ;
   int parse = 0;
   int syntax_flag = 0;
-  char temp_name[100];
 
   struct node_type * root = NULL;
   struct node_type * no_aux = NULL;
@@ -440,14 +439,10 @@ int main(int argc, char *argv[]) {
             yyparse();
             if ( syntax_flag != 1 )
             {
-                strcpy(temp_name, "===== Class ");
-                strcat(temp_name,root->child_node->token);
-                strcat(temp_name," Symbol Table =====");
-
-                root_pointer = create_table(temp_name,NULL);
+                root_pointer = create_table(root->child_node->token,NULL);
                 ast_to_sym_table(root,root_pointer);
                 print_table(root_pointer);
-                print_tree(root,0);
+                //print_tree(root,0);
             }
         }
 	}

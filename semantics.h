@@ -51,5 +51,7 @@ param_h * get_params( node_type * node );
 param_h * create_param(char * , char * );
 char * toLowerCase(char * );
 int check_double_var(table_header * , char *);
+void print_tables_params(table_header * );
+
 
 #endif
