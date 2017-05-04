@@ -1,11 +1,9 @@
 class gcd
 {
     public static int a;
-    public static int b(){}
+    public static double abc(int d, boolean d){}
     public static boolean c;
-    public static double d,e,f;
-    public static double asd( int x , boolean d){}
-    public static void main(String[] arg)
+    public static void main(String[] args)
     {
         int a,b;
     }

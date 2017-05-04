@@ -30,8 +30,8 @@ table_header * create_table ( char * name , param_h * paramtype )
 
     table_header * new_table = ( table_header *) malloc( sizeof(table_header));
     new_table->head = ( char *) malloc(strlen(name) * sizeof(char));
-
     strcpy(new_table->head,name);
+    //new_table->head[strlen(name)] = '\0';
     new_table->l_params = paramtype;
     new_table->lista_sym = NULL;
     new_table->next = NULL;
@@ -48,7 +48,7 @@ void add_table ( table_header * root, char * name , param_h * paramtype_aux)
         aux_table = aux_table->next;
     }
     param_h * paramtype = paramtype_aux;
-    char * temp_name = ( char * ) malloc ( 150 * sizeof(char));
+    char * temp_name = ( char * ) malloc ( 100 * sizeof(char));
     strcpy(temp_name,"===== Method ");
     strcat(temp_name,name);
     if ( paramtype != NULL )
@@ -91,7 +91,6 @@ void add_table ( table_header * root, char * name , param_h * paramtype_aux)
     else
         strcat(temp_name,"()");
     strcat(temp_name," Symbol Table =====");
-
     aux_table->next = create_table(temp_name,paramtype_aux);
 }
 
@@ -109,7 +108,7 @@ void add_sym_to_table( table_header * root, char * id , char * type, param_h * p
             {
                 if ( paramtype == NULL && f == 0)
                 {
-                    params_aux = create_param("jh","");
+                    params_aux = create_param("","");
                     root_aux->lista_sym = create_symbol(id,params_aux,type,flag);
                 }
                 else
@@ -124,7 +123,7 @@ void add_sym_to_table( table_header * root, char * id , char * type, param_h * p
 
                 if ( paramtype == NULL && f == 0)
                 {
-                    params_aux = create_param("m","");
+                    params_aux = create_param("","");
                     aux->next = create_symbol(id,params_aux,type,flag);
                 }
                 else
@@ -132,8 +131,6 @@ void add_sym_to_table( table_header * root, char * id , char * type, param_h * p
                     aux->next = create_symbol(id,paramtype,type,flag);
                 }
             }
-
-
         }
     }
     else
@@ -151,6 +148,7 @@ void add_sym_to_table( table_header * root, char * id , char * type, param_h * p
             while( aux->next != NULL)
                 aux = aux->next;
             aux->next = create_symbol(id,paramtype,type,flag);
+
         }
 
     }
@@ -209,19 +207,20 @@ void ast_to_sym_table( node_type * root , table_header * table_root)
                 bro_aux = root_aux->child_node->next_node;
                 if ( strcmp(bro_aux->type,"MethodBody") == 0 )
                 {
-                    //add_sym_to_table(table_root,"return",return_id,NULL,"",2,1);
                     while ( table_aux->next != NULL )
                         table_aux = table_aux->next;
                     if ( table_aux->l_params != NULL )
                     {
-
                         params_aux = table_aux->l_params;
+                        add_sym_to_table(table_root,"return",return_id,NULL,"",2,1);
                         while(params_aux)
                         {
                             add_sym_to_table(table_root,params_aux->id,params_aux->type,NULL,"param",2,1);
                             params_aux = params_aux->next;
                         }
                     }
+                    else
+                        add_sym_to_table(table_root,"return",return_id,NULL,"",2,1);
                     bro_aux = bro_aux->child_node;
                     while ( bro_aux )
                     {
@@ -290,11 +289,11 @@ void print_table( table_header * root)
 
     while (root_aux)
     {
-        printf("%s\n",root_aux->head);
+        printf("(%s)\n",root_aux->head);
         sym_aux = root_aux->lista_sym;
         while(sym_aux)
         {
-            printf("%s\t",sym_aux->id);
+            printf("(%s\t)",sym_aux->id);
             param_aux = sym_aux->params;
             while( param_aux )
             {
@@ -308,11 +307,11 @@ void print_table( table_header * root)
                     aux = 1;
                 }
                 if ( strcmp(param_aux->type,"StringArray") == 0 )
-                    printf("String[]");
+                    printf("(String[])");
                 else if ( strcmp(param_aux->type,"Bool") == 0 )
-                    printf("boolean");
+                    printf("(boolean)");
                 else
-                    printf("%s",toLowerCase(param_aux->type));
+                    printf("(%s)",toLowerCase(param_aux->type));
 
                 param_aux = param_aux->next;
             }
@@ -322,15 +321,15 @@ void print_table( table_header * root)
                 aux = 0;
             }
             if ( strcmp(sym_aux->type,"Bool") == 0 )
-                printf("\tboolean");
+                printf("(\tboolean)");
             else if ( strcmp(sym_aux->type,"StringArray") == 0 )
-                printf("\tString[]");
+                printf("(\tString[])");
             else
-                printf("\t%s",toLowerCase(sym_aux->type));
+                printf("(\t%s)",toLowerCase(sym_aux->type));
 
             if ( strcmp(sym_aux->flag,"") != 0 )
             {
-                printf("\t%s",sym_aux->flag);
+                printf("(\t%s)",sym_aux->flag);
             }
             sym_aux = sym_aux->next;
             printf("\n");
