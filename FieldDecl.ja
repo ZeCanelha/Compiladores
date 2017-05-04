@@ -32,6 +32,8 @@ class A
     public static double meth7(int a)
     {}
 
+    public static int e;
+
     public static int meth8()
     {}
 

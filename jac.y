@@ -442,7 +442,7 @@ int main(int argc, char *argv[]) {
                 root_pointer = create_table(root->child_node->token,NULL);
                 ast_to_sym_table(root,root_pointer);
                 print_table(root_pointer);
-                //print_tree(root,0);
+                print_tree(root,0);
             }
         }
 	}

@@ -118,7 +118,7 @@ void ast_to_sym_table( node_type * root , table_header * table_root)
     node_type * child_aux;
     node_type * bro_aux;
     table_header * table_aux = table_root;
-    char head[50];
+    char head[100];
     char type[10];
     char return_id[10];
     param_h * params;
@@ -132,8 +132,8 @@ void ast_to_sym_table( node_type * root , table_header * table_root)
             {
                 child_aux = root_aux->child_node;
                 //printf("Type: %s\nId: %s\n",child_aux->type,child_aux->next_node->token);
-                if ( check_double_var(table_root,child_aux->next_node->token) == 0)
-                    add_sym_to_table(table_root,child_aux->next_node->token,child_aux->type,NULL,"",1,1);
+                //if ( check_double_var(table_root,child_aux->next_node->token) == 0)
+                add_sym_to_table(table_root,child_aux->next_node->token,child_aux->type,NULL,"",1,1);
 
 
             }
